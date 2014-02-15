@@ -1,5 +1,6 @@
 package com.trade.rowData;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileReader;
@@ -24,6 +25,7 @@ public class DataStorage {
 	private static final String dailyMarket = "dailyMarket";
 	private static final DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
 	private static final DateFormat timeStampedDate = new SimpleDateFormat("yyyyMMdd-HHmmss");
+	private static final DateFormat timeFileDir = new SimpleDateFormat("yyyy/MM/dd/");
 	
 	
 	//this needs work!
@@ -48,7 +50,12 @@ public class DataStorage {
 	
 	public static void serializePartFile(Hashtable<String, Equity> allEquity) {
 		Date today = new Date();
-    	String outputName = outputDir+dailyMarket+timeStampedDate.format(today);
+    	
+		String outputName = outputDir+timeFileDir.format(today)+
+				dailyMarket+timeStampedDate.format(today);
+    	
+		File dir = new File(outputName);
+		dir.getParentFile().mkdirs();
 		try {
 	    	synchronized(allEquity) {
 	    		FileOutputStream fileOut = new FileOutputStream(outputName);
@@ -72,7 +79,6 @@ public class DataStorage {
 			String date = dateFormat.format(today);
 			JSONParser parser = new JSONParser();
 			JSONObject jsonObject = (JSONObject) parser.parse(new FileReader(AppendJSON.jsonFileName));
-			
 			
 			JSONArray dates = (JSONArray) jsonObject.get(AppendJSON.datesName);
 			if( !dates.contains(date) ) {

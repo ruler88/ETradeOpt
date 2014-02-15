@@ -272,7 +272,6 @@ public class GetMarket {
 					System.err.println("This is hour: " + hour);
 					
 					//serialize by part
-					
 					Hashtable<String, Equity> allEquityCopy = allEquity;
 					allEquity = new Hashtable<String, Equity>();
 					DataStorage.serializePartFile(allEquityCopy);
