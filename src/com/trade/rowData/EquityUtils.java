@@ -22,5 +22,4 @@ public class EquityUtils {
 		//averages the average at point i given total of count values
 		arr.set(i, arr.get(i) / count);
 	}
-	
 }

@@ -21,7 +21,6 @@ public class EquityToJSON {
 	public static void main(String[] args) throws IOException {
 		System.out.println("TEST");
 		generateJson("/mnt/tradingData/2014/02/03/dailyMarket20140203-210000");
-		
 	}
 	
 	@SuppressWarnings("unchecked")

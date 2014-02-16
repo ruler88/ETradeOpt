@@ -1,5 +1,6 @@
 package com.trade.JsonManager;
 
+import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.text.SimpleDateFormat;
@@ -63,7 +64,7 @@ public class AppendJSON {
 	}
 	
 	public static String getDateFromFilename(String fileName) {
-		if( fileName.contains("-150000") ) {
+		if( fileName.contains("-") ) {
 			return fileName.substring(fileName.length() - 15, fileName.length() - 7); //given hacked date
 		} else {
 			return fileName.substring(fileName.length() - 8);
@@ -85,13 +86,19 @@ public class AppendJSON {
 				Integer.parseInt(endTime.substring(6)));
 		
 		while(startDate.before(endDate) || startDate.equals(endDate)) {
-			fileNames.add(DataAnalysis.fileNameHeader + sdf.format(startDate.getTime()));
-			fileNames.add(DataAnalysis.fileNameHeader + sdf.format(startDate.getTime()) + "-150000");	//use one period
+			File fileDir = new File( DataAnalysis.dataHeadDir + 
+					DataAnalysis.timeFileDir.format(startDate.getTime()) );
+			
+			if(fileDir.isDirectory()) {
+				List<String> tmpFileList = DataAnalysis.getDayFile(fileDir);
+				if(tmpFileList != null && tmpFileList.size() > 0
+						&& tmpFileList.get(0) != null) {
+					fileNames.add(tmpFileList.get(0));
+				}
+			}
 			startDate.add(Calendar.DATE, 1);
 		}
 		
 		return fileNames;
 	}
-	//150000
-
 }

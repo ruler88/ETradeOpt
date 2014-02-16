@@ -1,5 +1,7 @@
 package com.trade.main;
 
+import java.io.File;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -12,7 +14,10 @@ import com.trade.rowData.Equity;
 
 
 public class DataAnalysis {
-	public static final String fileNameHeader = "/mnt/tradingData/dailyMarket";
+	public static final String dataHeadDir = DataStorage.outputDir;
+	public static final String dailyMarket = DataStorage.dailyMarket;
+	public static final DateFormat timeFileDir = DataStorage.timeFileDir;
+	
 	private final int summarizationFactor = 0;
 	public static void main(String[] args) {
 //		List<String> allFiles = getMarketFiles("20140124", "20140124");
@@ -88,10 +93,7 @@ public class DataAnalysis {
 	
 	
 	//get all files within date range
-	//TODO: change this getMarketFiles method
 	public static List<String> getMarketFiles(String startTime, String endTime) {
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
-		List<String> fileNames = new ArrayList<String>();
 		Calendar startDate = Calendar.getInstance();
 		startDate.set(Integer.parseInt(startTime.substring(0, 4)), 
 				Integer.parseInt(startTime.substring(4, 6))-1, 	//minus one 'cause calendar is dumb as shit
@@ -102,16 +104,31 @@ public class DataAnalysis {
 				Integer.parseInt(endTime.substring(4, 6))-1, 
 				Integer.parseInt(endTime.substring(6)));
 		
+		List<String> fileNames = new ArrayList<String>();
+		
 		while(startDate.before(endDate) || startDate.equals(endDate)) {
-			fileNames.add(fileNameHeader + sdf.format(startDate.getTime()));
+			File fileDir = new File( dataHeadDir + 
+					timeFileDir.format(startDate.getTime()) );
+			
+			if(fileDir.isDirectory()) {
+				fileNames.addAll(getDayFile(fileDir));
+			}
 			startDate.add(Calendar.DATE, 1);
 		}
 		
 		return fileNames;
 	}
 	
+	// helper for getMarketFiles
+	public static List<String> getDayFile(File fileDir) {
+		List<String> fileNames = new ArrayList<String>();
+		
+		for(File f : fileDir.listFiles()) {
+			if(f.isFile()) {
+				fileNames.add(f.toString());
+			}
+		}
+		return fileNames;
+	}
 	
 }
-
-
-
