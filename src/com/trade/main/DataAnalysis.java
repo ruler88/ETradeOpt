@@ -21,9 +21,10 @@ public class DataAnalysis {
 //		}
 		
 		List<String> allFiles = new ArrayList<String>();
-		//allFiles.add("/mnt/tradingData/dailyMarket20140207-150000");
+		
 		allFiles.add("/mnt/tradingData/dailyMarket20140205-210000");
 		allFiles.add("/mnt/tradingData/dailyMarket20140205-210003");
+		
 		DataAnalysis test = new DataAnalysis(allFiles);
 	}
 	
@@ -87,6 +88,7 @@ public class DataAnalysis {
 	
 	
 	//get all files within date range
+	//TODO: change this getMarketFiles method
 	public static List<String> getMarketFiles(String startTime, String endTime) {
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyyMMdd");
 		List<String> fileNames = new ArrayList<String>();

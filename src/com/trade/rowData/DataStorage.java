@@ -21,8 +21,8 @@ import org.json.simple.parser.JSONParser;
 import com.trade.JsonManager.AppendJSON;
 
 public class DataStorage {
-	private static final String outputDir = "/mnt/tradingData/";
-	private static final String dailyMarket = "dailyMarket";
+	public static final String outputDir = "/mnt/tradingData/";
+	public static final String dailyMarket = "dailyMarket";
 	private static final DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
 	private static final DateFormat timeStampedDate = new SimpleDateFormat("yyyyMMdd-HHmmss");
 	private static final DateFormat timeFileDir = new SimpleDateFormat("yyyy/MM/dd/");

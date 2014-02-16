@@ -3,6 +3,7 @@ package com.trade.rowData;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -28,7 +29,6 @@ public class Equity implements Serializable {
 	
 	public Equity(String ticker) {
 		this.ticker = ticker;
-		
 	}
 	
 	public void updateInfo(AllQuote allInfo) {
@@ -161,6 +161,20 @@ public class Equity implements Serializable {
 		this.numTrades.add(numTrades);
 		this.totalVolume.add(totalVolume);
 	}
+
+	public HashMap<String, List> getVariableMap() {
+		HashMap<String, List> equityVars = new HashMap<String, List>();
+		
+		equityVars.put("time", time);
+		equityVars.put("ask", ask);
+		equityVars.put("bid", bid);
+		equityVars.put("askSize", askSize);
+		equityVars.put("bidSize", bidSize);
+		equityVars.put("numTrades", numTrades);
+		equityVars.put("totalVolume", totalVolume);
+		
+		return equityVars;
+	}
 	
 	@Override
 	public String toString() {
@@ -189,7 +203,6 @@ public class Equity implements Serializable {
 		Equity eq = (Equity) o;
 		return this.ticker.equals(eq.ticker);	
 	}
-	
 }
 
 
