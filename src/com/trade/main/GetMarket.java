@@ -80,6 +80,7 @@ public class GetMarket {
 		TradeUtils.loadDailyHours(dailyHour);		//loading hours for hourly updates
 		
 		List<String> persistList = DataStorage.deserializePersistEquity();	//get the old equity list
+		GetOption.setPersistList(persistList);
 		
 		ArrayList<String> list = new ArrayList<String>();
 		//list.add("ZNGA");
@@ -108,6 +109,9 @@ public class GetMarket {
 		System.setOut(dummyStream);
 		
 		threadManager(list, request);
+		
+		//persist today's equity list for tomorrow
+		DataStorage.serializePersistEquity(list);
 		
 		//turn STDOUT back on
 		System.setOut(originalStream);
