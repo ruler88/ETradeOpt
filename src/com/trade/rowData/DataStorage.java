@@ -23,6 +23,7 @@ import com.trade.JsonManager.AppendJSON;
 public class DataStorage {
 	public static final String outputDir = "/mnt/tradingData/";
 	public static final String dailyMarket = "dailyMarket";
+	public static final String persistEquityList = outputDir + "persistEquity";
 	public static final DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
 	public static final DateFormat timeStampedDate = new SimpleDateFormat("yyyyMMdd-HHmmss");
 	public static final DateFormat timeFileDir = new SimpleDateFormat("yyyy/MM/dd/");
@@ -72,7 +73,39 @@ public class DataStorage {
 	    }
 	}
 	
-	@SuppressWarnings("unchecked")		//silly generic typing for JSON
+	public static List<String> deserializePersistEquity() {
+		List<String> result = null;
+		
+		try {
+			FileInputStream fileIn = new FileInputStream(persistEquityList);
+			ObjectInputStream in = new ObjectInputStream(fileIn);
+			result = (List<String>) in.readObject();
+			in.close();
+			fileIn.close();
+			System.err.println("Deserialization complete: " + persistEquityList);
+		} catch (Exception e) {
+			System.err.println("Deserialization failed: " + e.getMessage());
+		}
+		return result;
+	}
+	
+	//serialize a list containing equity need to persist
+	public static void serializePersistEquity(List<String> eqList) {
+		File file = new File(persistEquityList);
+		try {
+			FileOutputStream fileOut = new FileOutputStream(file);
+			ObjectOutputStream out = new ObjectOutputStream(fileOut);
+			out.writeObject(eqList);
+			fileOut.close();
+			out.close();
+			System.err.println("Persist Equity serialization complete");
+		} catch (Exception e) {
+			System.err.println("Persist Equity serialization failed: " + e.getMessage());
+		}
+		
+	}
+	
+	@SuppressWarnings("unchecked")
 	public static void updateDatesEquityJson(List<String> eq) {
 		try {
 			Date today = new Date();

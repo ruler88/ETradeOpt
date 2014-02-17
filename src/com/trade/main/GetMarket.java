@@ -77,7 +77,9 @@ public class GetMarket {
 		request.setToken(oauth_access_token);
 		request.setTokenSecret(oauth_access_token_secret);
 		
-		TradeUtils.loadDailyHours(dailyHour);
+		TradeUtils.loadDailyHours(dailyHour);		//loading hours for hourly updates
+		
+		List<String> persistList = DataStorage.deserializePersistEquity();	//get the old equity list
 		
 		ArrayList<String> list = new ArrayList<String>();
 		//list.add("ZNGA");

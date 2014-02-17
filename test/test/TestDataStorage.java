@@ -1,5 +1,7 @@
 package test;
 
+import static org.junit.Assert.assertTrue;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Hashtable;
@@ -43,4 +45,32 @@ public class TestDataStorage {
 		DataStorage.serializePartFile(allEquity);
 	}
 
+	@Test
+	public void testSerializePersistEquity() {
+		ArrayList<String> dummyEqs = new ArrayList<String>();
+		dummyEqs.add("GOOG");
+		dummyEqs.add("ABC");
+		dummyEqs.add("XYZ");
+		
+		DataStorage.serializePersistEquity(dummyEqs);
+		
+		List<String> deserializedPersist = DataStorage.deserializePersistEquity();
+		
+		assertTrue(deserializedPersist.contains("GOOG"));
+		assertTrue(deserializedPersist.contains("ABC"));
+		assertTrue(deserializedPersist.contains("XYZ"));
+		
+		for(String s : deserializedPersist) {
+			System.out.println(s);
+		}
+	}
+	
+	@Test
+	public void testDeserializePersistEquity() {
+		List<String> deserializedPersist = DataStorage.deserializePersistEquity();
+		
+		for(String s : deserializedPersist) {
+			System.out.println(s);
+		}
+	}
 }
