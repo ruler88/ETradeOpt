@@ -130,6 +130,27 @@ public class Equity implements Serializable {
 		this.totalVolume.addAll(eq.totalVolume);
 	}
 	
+	public boolean isCleanEquity() {
+		int timeLength = time.size();
+		if(ask == null || bid == null || askSize == null || bidSize == null ||
+			numTrades == null || totalVolume == null) {
+			System.err.println("Missing variable " + this.toString());
+			return false;
+		}
+		if(ask.size() != timeLength || bid.size() != timeLength || 
+			askSize.size() != timeLength || bidSize.size() != timeLength ||
+			numTrades.size() != timeLength || totalVolume.size() != timeLength) {
+			System.err.println("Mismatch length: ");
+			System.err.println("time: " + time.size() + " ask: " + ask.size() + " bid: " + bid.size() +
+					" askSize: " + askSize.size() + " bidSize: " + bidSize.size() + 
+					" numTrades: " + numTrades.size() + " totalVolume: " + totalVolume.size()
+					);
+			System.err.println(this.toString());
+			return false;
+		}
+		return true;
+	}
+	
 
 	public List<Double> getAsk() {
 		return ask;
