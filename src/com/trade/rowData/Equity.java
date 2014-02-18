@@ -2,6 +2,7 @@ package com.trade.rowData;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -185,8 +186,12 @@ public class Equity implements Serializable {
 
 	public HashMap<String, List> getVariableMap() {
 		HashMap<String, List> equityVars = new HashMap<String, List>();
+		List<Long> longTime = new ArrayList<Long>();
+		for(Date timePoint : time) {
+			longTime.add(timePoint.getTime());
+		}
 		
-		equityVars.put("time", time);
+		equityVars.put("time", longTime);
 		equityVars.put("ask", ask);
 		equityVars.put("bid", bid);
 		equityVars.put("askSize", askSize);
