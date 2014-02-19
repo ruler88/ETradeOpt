@@ -138,6 +138,7 @@ public class GetOption {
 	}
 	
 	public static void setPersistList(List<String> newPersistList) {
+		if(newPersistList == null) { return; }	//error check
 		for(String s : newPersistList) {
 			persistList.add(s);
 		}

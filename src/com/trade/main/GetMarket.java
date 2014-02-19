@@ -79,9 +79,6 @@ public class GetMarket {
 		
 		TradeUtils.loadDailyHours(dailyHour);		//loading hours for hourly updates
 		
-		List<String> persistList = DataStorage.deserializePersistEquity();	//get the old equity list
-		GetOption.setPersistList(persistList);
-		
 		ArrayList<String> list = new ArrayList<String>();
 		//list.add("ZNGA");
 		//list.add("FLWS");
@@ -93,6 +90,8 @@ public class GetMarket {
 		list.add("RIO");
 		list.add("AMZN");
 		
+		List<String> persistList = DataStorage.deserializePersistEquity();	//get the old equity list
+		GetOption.setPersistList(persistList);
 		GetOption.addExpiringOptions(new MarketClient(request), list);
 		
 		System.out.println(Arrays.deepToString(list.toArray()));
