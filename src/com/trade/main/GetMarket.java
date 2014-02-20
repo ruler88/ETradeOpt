@@ -63,6 +63,8 @@ public class GetMarket {
 				AccountVerification acct = new AccountVerification();
 				GetMarket gm = new GetMarket(acct.getAccessToken(), acct.getAccessTokenSecret());
 			} catch (Exception e) {
+				e.printStackTrace();
+				System.err.print(e.getMessage());
 				System.exit(1);	//exception error code
 			}
 			System.exit(0);  //normal exit
@@ -82,7 +84,7 @@ public class GetMarket {
 		request.setToken(oauth_access_token);
 		request.setTokenSecret(oauth_access_token_secret);
 		
-		TradeUtils.loadDailyHours(dailyHour);		//loading hours for hourly updates
+		TradeUtils.loadDailyHours(dailyHour);		//loading hours for hourly updates	
 		
 		ArrayList<String> list = new ArrayList<String>();
 		//list.add("ZNGA");
