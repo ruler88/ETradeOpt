@@ -53,14 +53,19 @@ public class GetMarket {
 		
 		if(testMode) {
 			//testMode does not run account verification
-			String oauth_access_token = "yavQERCdN6JzNJAju8t/oqIckguDerGtdn1UVw8rf6o=";
-			String oauth_access_token_secret = "5pfH1u8x6yt95VQqPS3K1aKl+Lk1pQa+V5BmqvLqfUE=";
+			String oauth_access_token = "fnryOsxeg/W3maKgfe7kCLDfUIH+qAYIWP6u3tQVv4s=";
+			String oauth_access_token_secret = "x0qGM8Ck9Lm/m3HoPuRaz80N4NUBRylCwX56Sfab89w=";
 			
 			logFile = "/Users/kchao/dailyLog.log";
 			GetMarket gm = new GetMarket(oauth_access_token, oauth_access_token_secret);
 		} else {
-			AccountVerification acct = new AccountVerification();
-			GetMarket gm = new GetMarket(acct.getAccessToken(), acct.getAccessTokenSecret());
+			try{
+				AccountVerification acct = new AccountVerification();
+				GetMarket gm = new GetMarket(acct.getAccessToken(), acct.getAccessTokenSecret());
+			} catch (Exception e) {
+				System.exit(1);	//exception error code
+			}
+			System.exit(0);  //normal exit
 		}
 	}
 	
@@ -94,11 +99,11 @@ public class GetMarket {
 		GetOption.setPersistList(persistList);
 		GetOption.addExpiringOptions(new MarketClient(request), list);
 		
-		System.out.println(Arrays.deepToString(list.toArray()));
-		
+		System.err.println(Arrays.deepToString(list.toArray()));
+		System.err.println("Equity list size: " + list.size());
 		//shut down STDOUT to conserve instance RAM
-		System.out.println("\nTrading system starting!!!");
-		System.out.println("STDOUT is shutting down");
+		System.err.println("\nTrading system starting!!!");
+		System.err.println("STDOUT is shutting down");
 		PrintStream originalStream = System.out;
 		PrintStream dummyStream = new PrintStream(new OutputStream(){
 		    public void write(int b) {

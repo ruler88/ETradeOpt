@@ -23,7 +23,7 @@ import com.etrade.etws.sdk.client.MarketClient;
 import com.etrade.etws.sdk.common.ETWSException;
 
 public class GetOption {
-	private static HashSet<String> persistList = null;	//list of equities that we try to persist if they still exist
+	private static HashSet<String> persistList = new HashSet<String>();	//list of equities that we try to persist if they still exist
 	
 	public static void addExpiringOptions(MarketClient client, List<String> list) throws IOException, ETWSException {
 		ArrayList<String> expOptions = new ArrayList<String>();
@@ -55,8 +55,8 @@ public class GetOption {
 		OptionChainResponse response = client.getOptionChain(req);
 		
 		BigDecimal lastStrikePrice = new BigDecimal(0);
+		boolean findingPrice = true;
 		for(OptionChainPair op : response.getOptionPairs()) {
-			boolean findingPrice = true;
 			for(CallOptionChain co : op.getCall()) {
 				if(co.getStrikePrice().doubleValue() > underlierPrice && findingPrice) {
 					//add price above and below stock price point
