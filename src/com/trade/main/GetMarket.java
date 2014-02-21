@@ -26,6 +26,7 @@ import com.etrade.etws.sdk.client.Environment;
 import com.etrade.etws.sdk.client.MarketClient;
 import com.etrade.etws.sdk.common.ETWSException;
 import com.trade.accountVerify.AccountVerification;
+import com.trade.insights.Notifier;
 import com.trade.rowData.DataStorage;
 import com.trade.rowData.Equity;
 
@@ -53,8 +54,8 @@ public class GetMarket {
 		
 		if(testMode) {
 			//testMode does not run account verification
-			String oauth_access_token = "fnryOsxeg/W3maKgfe7kCLDfUIH+qAYIWP6u3tQVv4s=";
-			String oauth_access_token_secret = "x0qGM8Ck9Lm/m3HoPuRaz80N4NUBRylCwX56Sfab89w=";
+			String oauth_access_token = "TTsF290ePVIltBmPkc1FIID40QY4NOEpRjAcSXRwtSg=";
+			String oauth_access_token_secret = "iqvOYXcoW5dBkhJ6FeNGd1GEOqL36/rQbadO8WiN9tc=";
 			
 			logFile = "/Users/kchao/dailyLog.log";
 			GetMarket gm = new GetMarket(oauth_access_token, oauth_access_token_secret);
@@ -65,6 +66,8 @@ public class GetMarket {
 			} catch (Exception e) {
 				e.printStackTrace();
 				System.err.print(e.getMessage());
+				Notifier.sendSMS("Etrade failed, check email");
+				Notifier.sendEmail("helloworld0424@gmail.com", "Etrade failed!", e.getMessage());
 				System.exit(1);	//exception error code
 			}
 			System.exit(0);  //normal exit
@@ -182,6 +185,7 @@ public class GetMarket {
 					System.err.println(e.getMessage());
 					System.err.println(e.getLocalizedMessage());
 					e.printStackTrace();
+					Notifier.sendEmail("helloworld0424@gmail.com", "Etrade illegal thread", e.getMessage());
 				}
 			}
 			if(testCount > 0) {
@@ -238,6 +242,7 @@ public class GetMarket {
 			} catch (Exception e) {
 				System.out.println(e.getMessage());
 				e.printStackTrace();
+				Notifier.sendEmail("helloworld0424@gmail.com", "Etrade thread went bad", e.getMessage());
 			}
 			currentThreads.remove(getFirstString(list));
 		}

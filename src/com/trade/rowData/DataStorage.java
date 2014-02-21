@@ -19,6 +19,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
 import com.trade.JsonManager.AppendJSON;
+import com.trade.insights.Notifier;
 
 public class DataStorage {
 	public static final String outputDir = "/mnt/tradingData/";
@@ -79,12 +80,13 @@ public class DataStorage {
 			        out.close();
 			        System.err.println("EMERGENCY serialization complete, file written to: " + outputName);
 			        updateDatesEquityJson( new ArrayList<String>(allEquity.keySet()) );
-			        //send email here
+			        Notifier.sendEmail("helloworld0424@gmail.com", "Etrade emergency file dump activated", e.getMessage());
 				}
 			} catch (Exception reallyFailed) {
 				System.err.println("serialization failed: " + outputName);
 				reallyFailed.printStackTrace();
-				//send email here
+				Notifier.sendEmail("helloworld0424@gmail.com", "Etrade file write failing", e.getMessage());
+		        Notifier.sendSMS("Etrade file write failing");
 			}
 	    }
 	}
