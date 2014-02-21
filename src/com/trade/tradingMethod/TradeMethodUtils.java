@@ -1,6 +1,6 @@
 package com.trade.tradingMethod;
 
-public class TradeUtils {
+public class TradeMethodUtils {
 	
 	public static double getStrikePrice(String s) {
 		//an option ticker looks like this: "GOOG:2014:1:18:PUT:1120.00"

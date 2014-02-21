@@ -10,7 +10,7 @@ public class OptionStrikePoint {
 	public static void process(Equity underlier, Equity call, Equity put) {
 		double percentMovementPoint = 0.4 * 0.01;		//waiting for 0.4% movement
 		long timeDiff = 1000*60*5;		//indicate limit after reading strike zone [in ms] (5 mins)
-		double strikePrice = TradeUtils.getStrikePrice(call.ticker);
+		double strikePrice = TradeMethodUtils.getStrikePrice(call.ticker);
 		double denom = 0.0;
 		double numa = 0.0;
 		
