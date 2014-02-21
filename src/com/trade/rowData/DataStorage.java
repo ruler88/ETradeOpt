@@ -68,8 +68,24 @@ public class DataStorage {
 		        updateDatesEquityJson( new ArrayList<String>(allEquity.keySet()) );
 	    	}
 		} catch (Exception e) {
-	    	System.err.println("serialization failed: " + outputName);
-	    	e.printStackTrace();
+			try{
+				//emergency file dump so data is not lost
+				synchronized(allEquity) {
+					String emergencyFileDump = "/mnt/tradingData/" + dailyMarket+timeStampedDate.format(today);
+					FileOutputStream fileOut = new FileOutputStream(emergencyFileDump);
+					ObjectOutputStream out = new ObjectOutputStream(fileOut);
+			        out.writeObject(allEquity);
+			        fileOut.close();
+			        out.close();
+			        System.err.println("EMERGENCY serialization complete, file written to: " + outputName);
+			        updateDatesEquityJson( new ArrayList<String>(allEquity.keySet()) );
+			        //send email here
+				}
+			} catch (Exception reallyFailed) {
+				System.err.println("serialization failed: " + outputName);
+				reallyFailed.printStackTrace();
+				//send email here
+			}
 	    }
 	}
 	
