@@ -152,6 +152,37 @@ public class Equity implements Serializable {
 		return true;
 	}
 	
+	public boolean cleanEquity(int timeTolerance) {
+		if(isCleanEquity()) { return true; }
+		int timeLength = time.size();
+		if(ask == null || bid == null || askSize == null || bidSize == null ||
+			numTrades == null || totalVolume == null) {
+			System.err.println("Missing variable " + this.toString());
+			return false;
+		}
+		if(ask.size() == bid.size() && bid.size() == askSize.size() && askSize.size() == bidSize.size() &&
+				numTrades.size() == ask.size() && totalVolume.size() == ask.size()) {
+			if( Math.abs(ask.size() - timeLength) < timeTolerance ) {
+				if( timeLength > ask.size() ) {
+					for(int i=timeLength-1; i>=ask.size(); i--) {
+						time.remove(i);
+					}
+					return true;
+				} else {
+					Date tmpDate = time.get(time.size()-1);
+					for(int i=0; i<timeLength-ask.size(); i++) {
+						time.add(tmpDate);
+					}
+				}
+				return true;
+			} else {
+				return false;
+			}
+		} else {
+			return false;
+		}
+	}
+	
 
 	public List<Double> getAsk() {
 		return ask;
