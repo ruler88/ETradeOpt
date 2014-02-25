@@ -168,10 +168,10 @@ public class GetMarket {
 			timeCheck(calendar.get(Calendar.HOUR_OF_DAY));	//log current time on the hour
 			
 			for(int i=0; i<allThreadsList.size(); i++) {
-				
+				Thread.sleep(200);
 				if(i%4 == 0) {
 					//rest every second to keep rate limit
-					Thread.sleep(1000);
+					Thread.sleep(200);
 				}
 				try {
 					String s = getFirstString(allThreadsList.get(i));
