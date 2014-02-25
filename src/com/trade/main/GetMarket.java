@@ -8,6 +8,7 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.GregorianCalendar;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -54,8 +55,8 @@ public class GetMarket {
 		
 		if(testMode) {
 			//testMode does not run account verification
-			String oauth_access_token = "TTsF290ePVIltBmPkc1FIID40QY4NOEpRjAcSXRwtSg=";
-			String oauth_access_token_secret = "iqvOYXcoW5dBkhJ6FeNGd1GEOqL36/rQbadO8WiN9tc=";
+			String oauth_access_token = "8aXA6OBnok64jKnaBYFQ7fztZqXWt6+by7VwQnocob4=";
+			String oauth_access_token_secret = "Rusj35spCrnH3vuqRZgEV/dbfFaLSD/JViPRywwq1As=";
 			
 			logFile = "/Users/kchao/dailyLog.log";
 			GetMarket gm = new GetMarket(oauth_access_token, oauth_access_token_secret);

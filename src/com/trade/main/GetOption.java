@@ -43,6 +43,7 @@ public class GetOption {
 		for(String s : expOptions) {
 			list.add(s);
 		}
+		removeDup(list);
 		Collections.sort(list);
 	}
 	
@@ -142,6 +143,12 @@ public class GetOption {
 		for(String s : newPersistList) {
 			persistList.add(s);
 		}
+	}
+	
+	public static void removeDup(List<String> list) {
+		HashSet<String> hs = new HashSet<String>(list);
+		list.clear();
+		list.addAll(hs);
 	}
 	
 	
