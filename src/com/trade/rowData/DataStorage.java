@@ -20,6 +20,7 @@ import org.json.simple.parser.JSONParser;
 
 import com.trade.JsonManager.AppendJSON;
 import com.trade.insights.Notifier;
+import com.trade.main.GetMarket;
 
 public class DataStorage {
 	public static final String outputDir = "/mnt/tradingData/";
@@ -55,6 +56,10 @@ public class DataStorage {
     	
 		String outputName = outputDir+timeFileDir.format(today)+
 				dailyMarket+timeStampedDate.format(today);
+		
+		if(GetMarket.testMode) {
+			outputName = "/tmp/"+ dailyMarket+timeStampedDate.format(today);
+		}
     	
 		File dir = new File(outputName);
 		dir.getParentFile().mkdirs();
