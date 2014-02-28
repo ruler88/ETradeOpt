@@ -22,7 +22,7 @@ public class EquityToJSON {
 
 	public static void main(String[] args) throws IOException {
 		System.out.println("TEST");
-		generateJsonRange("20140201", "20140221");
+		generateJsonRange("20140227", "20140227");
 	}
 	
 	
@@ -63,7 +63,7 @@ public class EquityToJSON {
 					System.err.println("Bad equity found: " + eq + " " + DataStorage.dateFormat.format(date.getTime()));
 					continue;
 				}
-				tmpEq.avgSummarizeEquity(summarizationFactor);
+				tmpEq.summarizeEquity(summarizationFactor);
 				
 				if(equityMap.containsKey(eq)) {
 					equityMap.get(eq).appendEquity(tmpEq);

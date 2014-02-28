@@ -65,6 +65,7 @@ public class DataStorage {
 		dir.getParentFile().mkdirs();
 		try {
 	    	synchronized(allEquity) {
+	    		lockEquities(allEquity);
 	    		FileOutputStream fileOut = new FileOutputStream(outputName);
 		        ObjectOutputStream out = new ObjectOutputStream(fileOut);
 		        out.writeObject(allEquity);
@@ -77,6 +78,7 @@ public class DataStorage {
 			try{
 				//emergency file dump so data is not lost
 				synchronized(allEquity) {
+					lockEquities(allEquity);
 					String emergencyFileDump = "/mnt/tradingData/" + dailyMarket+timeStampedDate.format(today);
 					FileOutputStream fileOut = new FileOutputStream(emergencyFileDump);
 					ObjectOutputStream out = new ObjectOutputStream(fileOut);
@@ -94,6 +96,12 @@ public class DataStorage {
 		        Notifier.sendSMS("Etrade file write failing");
 			}
 	    }
+	}
+	
+	private static void lockEquities(Hashtable<String, Equity> allEquity) {
+		for( String key : allEquity.keySet() ) {
+			allEquity.get(key).lockEquity();
+		}
 	}
 	
 	public static List<String> deserializePersistEquity() {

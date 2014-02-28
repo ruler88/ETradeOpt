@@ -34,7 +34,7 @@ import com.trade.rowData.Equity;
 
 public class GetMarket {
 	Hashtable<String, Equity> allEquity = new Hashtable<String, Equity>();
-	private static boolean testMode = false;
+	public static boolean testMode = false;
 	private static int testCount = 0;
 	
 	public static final String TZ = "America/New_York";
@@ -169,10 +169,10 @@ public class GetMarket {
 			timeCheck(calendar.get(Calendar.HOUR_OF_DAY));	//log current time on the hour
 			
 			for(int i=0; i<allThreadsList.size(); i++) {
-				Thread.sleep(200);
+				Thread.sleep(250);
 				if(i%4 == 0) {
 					//rest every second to keep rate limit
-					Thread.sleep(200);
+					Thread.sleep(250);
 				}
 				try {
 					String s = getFirstString(allThreadsList.get(i));

@@ -26,9 +26,7 @@ public class DataAnalysis {
 //		}
 		
 		List<String> allFiles = new ArrayList<String>();
-		
-		allFiles.add("/mnt/tradingData/dailyMarket20140205-210000");
-		allFiles.add("/mnt/tradingData/dailyMarket20140205-210003");
+		allFiles = getMarketFiles("20140225", "20140225");
 		
 		DataAnalysis test = new DataAnalysis(allFiles);
 	}
@@ -38,7 +36,9 @@ public class DataAnalysis {
 		for(String name : files) {
 			Hashtable<String, Equity> oneDayEquity = DataStorage.deserializeFile(name);
 			for(String s : oneDayEquity.keySet()) {
+				if(!s.equals("GS:2014:3:22:CALL:165.00") && !s.equals("GS")) continue;
 				Equity tmpEquity = oneDayEquity.get(s);
+				System.err.println(tmpEquity.toString());
 				if( tmpEquity.getAsk().size() == 0 ) {
 					System.err.println("Failed equity: " + name + " - " + s);
 					continue;	//prevent empty equity from breaking the code
@@ -56,7 +56,7 @@ public class DataAnalysis {
 		}
 		
 		ArrayList<Equity> viewEqs = new ArrayList<Equity>();
-		viewEqs.add(allEquity.get("GOOG"));
+		viewEqs.add(allEquity.get("GS:2014:3:22:CALL:165.00"));
 		
 		printEquities(viewEqs);
 	}
@@ -71,6 +71,7 @@ public class DataAnalysis {
 		System.out.println();
 		
 		List<Date> time = eqs.get(0).getTime();
+		System.out.println("Length: " + time.size());
 		for(int i=0; i<time.size(); i++) {
 			for(int j=0; j<eqs.size(); j++) {
 				printEquityProp(eqs.get(j), i);

@@ -184,6 +184,10 @@ public class Equity implements Serializable {
 	}
 	
 
+	public void lockEquity() {		//simply prevents the system from streaming out before equity is unlocked
+		lock.lock();
+	}
+
 	public List<Double> getAsk() {
 		return ask;
 	}
