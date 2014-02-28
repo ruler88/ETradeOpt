@@ -284,15 +284,14 @@ public class GetMarket {
 	private void timeCheck(int hour) {
 		//outputs time if it is on the mark (for monitoring)
 		if(hour >= dailyHour.peek()) {
+			Hashtable<String, Equity> allEquityCopy = allEquity;
+			allEquity = new Hashtable<String, Equity>();
 			dailyHour.poll();
-			synchronized(allEquity) {
+			synchronized(allEquityCopy) {
 				try {
 					fileWritter.write("\nTrading system is operational! Currently EST " + hour);
 					System.err.println("This is hour: " + hour);
 					
-					//serialize by part
-					Hashtable<String, Equity> allEquityCopy = allEquity;
-					allEquity = new Hashtable<String, Equity>();
 					DataStorage.serializePartFile(allEquityCopy);
 				} catch (IOException e) {
 					e.printStackTrace();
