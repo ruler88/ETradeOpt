@@ -1,4 +1,4 @@
-package com.trade.tradingMethod;
+package com.trade.tradeTraining;
 
 import java.util.Date;
 import java.util.List;
