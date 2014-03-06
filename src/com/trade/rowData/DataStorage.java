@@ -58,6 +58,7 @@ public class DataStorage {
 				dailyMarket+timeStampedDate.format(today);
 		
 		if(GetMarket.testMode) {
+			printMapEq(allEquity);
 			outputName = "/tmp/"+ dailyMarket+timeStampedDate.format(today);
 		}
     	
@@ -159,6 +160,12 @@ public class DataStorage {
 		} catch (Exception e) {
 			//Catch any exceptions here. don't want to break main process if this fails!
 			e.printStackTrace();
+		}
+	}
+	
+	private static void printMapEq(Hashtable<String, Equity> allEquities) {
+		for( String s : allEquities.keySet() ) {
+			System.out.println(s + " " + allEquities.get(s).toString());
 		}
 	}
 }
