@@ -139,7 +139,7 @@ public class GetMarket {
 		for(int i=0; i<list.size(); i++) {
 			urlReqLen += (list.get(i).length()+1);
 			reqCount += 1;
-			if(urlReqLen > 2000 || reqCount > 25 ) {	//url length limit is 2k and request count max is 25
+			if( newList.size() > 0 && (urlReqLen > 2000 || reqCount > 25) ) {	//url length limit is 2k and request count max is 25
 				allThreadsList.add(newList);
 				i--;
 				urlReqLen = "https://etws.etrade.com/market/rest/quote/".length() + 5;
@@ -149,7 +149,7 @@ public class GetMarket {
 				ArrayList<String> tmpNewList = new ArrayList<String>();
 				String lastUnderlier = TradeUtils.getUnderlier( newList.get(newList.size()-1) );
 				
-				while(lastUnderlier.equals( TradeUtils.getUnderlier( newList.get(newList.size()-1)))) {
+				while( newList.size() > 0 && lastUnderlier.equals( TradeUtils.getUnderlier( newList.get(newList.size()-1)))) {
 					tmpNewList.add(0, newList.remove(newList.size()-1));
 					urlReqLen += tmpNewList.get(0).length();
 					reqCount += 1;
