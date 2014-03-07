@@ -22,7 +22,7 @@ public class EquityToJSON {
 
 	public static void main(String[] args) throws IOException {
 		System.out.println("TEST");
-		generateJsonRange("20140227", "20140227");
+		generateJsonRange("20140304", "20140304");
 	}
 	
 	

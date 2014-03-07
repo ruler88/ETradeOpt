@@ -8,7 +8,6 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.GregorianCalendar;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -55,8 +54,8 @@ public class GetMarket {
 		
 		if(testMode) {
 			//testMode does not run account verification
-			String oauth_access_token = "8aXA6OBnok64jKnaBYFQ7fztZqXWt6+by7VwQnocob4=";
-			String oauth_access_token_secret = "Rusj35spCrnH3vuqRZgEV/dbfFaLSD/JViPRywwq1As=";
+			String oauth_access_token = "pGADgoy3iUCjR+/Zrdo4+L+gXlqleD7T5e/THvFIZaU=";
+			String oauth_access_token_secret = "g6N1Jfbk708q13aK2AyCvtoUW79OT6ko+3mwz9JmNho=";
 			
 			logFile = "/Users/kchao/dailyLog.log";
 			GetMarket gm = new GetMarket(oauth_access_token, oauth_access_token_secret);
@@ -132,36 +131,7 @@ public class GetMarket {
 	}	
 	
 	public void threadManager(ArrayList<String> list, ClientRequest request) throws InterruptedException {
-		ArrayList<ArrayList<String>> allThreadsList = new ArrayList<ArrayList<String>>();
-		ArrayList<String> newList = new ArrayList<String>();
-		int urlReqLen = "https://etws.etrade.com/market/rest/quote/".length() + 5;
-		int reqCount = 0;
-		for(int i=0; i<list.size(); i++) {
-			urlReqLen += (list.get(i).length()+1);
-			reqCount += 1;
-			if( newList.size() > 0 && (urlReqLen > 2000 || reqCount > 25) ) {	//url length limit is 2k and request count max is 25
-				allThreadsList.add(newList);
-				i--;
-				urlReqLen = "https://etws.etrade.com/market/rest/quote/".length() + 5;
-				reqCount = 0;
-				
-				//ensure all equity items in the same underlier end up in the same thread
-				ArrayList<String> tmpNewList = new ArrayList<String>();
-				String lastUnderlier = TradeUtils.getUnderlier( newList.get(newList.size()-1) );
-				
-				while( newList.size() > 0 && lastUnderlier.equals( TradeUtils.getUnderlier( newList.get(newList.size()-1)))) {
-					tmpNewList.add(0, newList.remove(newList.size()-1));
-					urlReqLen += tmpNewList.get(0).length();
-					reqCount += 1;
-				}
-				newList = tmpNewList;
-			} else {
-				newList.add(list.get(i));
-			}
-		}
-		if(reqCount > 0) {
-			allThreadsList.add(newList);
-		}
+		ArrayList<ArrayList<String>> allThreadsList = TradeUtils.getEquityThreadList(list);
 		
 		while( (calendar.get(Calendar.HOUR_OF_DAY) > 8 && calendar.get(Calendar.HOUR_OF_DAY) < 16) 
 				|| testCount > 0) {
