@@ -8,6 +8,7 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -200,6 +201,9 @@ public class GetMarket {
 							Equity tmpEquity = allEquity.get(symbol);
 							tmpEquity.updateInfo(allInfo);
 						} else {
+							if(symbol.equals("GS")) {
+								fileWritter.write("Writing new GS: " + new Date() );
+							}
 							Equity tmpEquity = new Equity(symbol);
 							tmpEquity.updateInfo(allInfo);
 							allEquity.put(symbol, tmpEquity);
@@ -257,12 +261,18 @@ public class GetMarket {
 			Hashtable<String, Equity> allEquityCopy = allEquity;
 			allEquity = new Hashtable<String, Equity>();
 			dailyHour.poll();
+			try {
+				fileWritter.write("Pre sync time write: " + new Date() );
+			} catch (IOException e1) { }
 			synchronized(allEquityCopy) {
 				try {
+					fileWritter.write("Post sync time write: " + new Date() );
+					
 					fileWritter.write("\nTrading system is operational! Currently EST " + hour);
 					System.err.println("This is hour: " + hour);
 					
 					DataStorage.serializePartFile(allEquityCopy);
+					fileWritter.write("Post serialize time write: " + new Date() );
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
