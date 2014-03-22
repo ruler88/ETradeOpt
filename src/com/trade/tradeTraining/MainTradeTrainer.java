@@ -3,18 +3,23 @@ package com.trade.tradeTraining;
 import java.util.List;
 
 public class MainTradeTrainer {
-	private String startDate = "20140227";
-	private String endDate =   "20140303";
-	private float capital = 10000;
+	private final static String startDate = "20140227";
+	private final static String endDate =   "20140303";
+	private static float capital = 10000;
 	
-	private List<String> eqLimit = null;
-	
+	private final static List<String> eqLimit = null;
 	
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-
+		new MainTradeTrainer();
 	}
 	
+	public MainTradeTrainer() {
+		this(startDate, endDate, capital, eqLimit);
+	}
+	
+	public MainTradeTrainer(String startDate, String endDate, float capital, List<String> eqLimit) {
+		
+	}
 	
 	
 	
