@@ -26,7 +26,7 @@ public class DataAnalysis {
 //		}
 		
 		List<String> allFiles = new ArrayList<String>();
-		allFiles = getMarketFiles("20140225", "20140225");
+		allFiles = getMarketFiles("20140310", "20140310");
 		
 		DataAnalysis test = new DataAnalysis(allFiles);
 	}
@@ -56,7 +56,7 @@ public class DataAnalysis {
 		}
 		
 		ArrayList<Equity> viewEqs = new ArrayList<Equity>();
-		viewEqs.add(allEquity.get("GS:2014:3:22:CALL:165.00"));
+		viewEqs.add(allEquity.get("GS"));
 		
 		printEquities(viewEqs);
 	}

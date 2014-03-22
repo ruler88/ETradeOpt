@@ -24,7 +24,7 @@ public class AppendJSON {
 	
 	public static void main(String[] args) {
 		//this main is only for first-time run
-		List<String> allFiles = getMarketFilesHack("20140210", "20140210");
+		List<String> allFiles = getMarketFilesHack("20140210", "20140215");
 		
 		for(String serializedFile : allFiles) {
 			try {
