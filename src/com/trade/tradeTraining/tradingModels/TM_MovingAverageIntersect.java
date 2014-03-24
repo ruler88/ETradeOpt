@@ -2,7 +2,8 @@ package com.trade.tradeTraining.tradingModels;
 
 import java.util.HashSet;
 import java.util.Hashtable;
-import java.util.List;
+import java.util.Iterator;
+import java.util.Map;
 
 import com.trade.rowData.Equity;
 
@@ -12,11 +13,15 @@ public class TM_MovingAverageIntersect extends TradingModelAbstract {
 	
 	@Override
 	public void equityFilter(Hashtable<String, Equity> equity) {
-		HashSet<String> filterSet = new HashSet<String>(filterList);
+		if(filterList == null) return;	//no filter in place, use all eq
 		
-		for(String eqKey : equity.keySet()) {
-			if(!filterSet.contains(eqKey)) {
-				equity.remove(eqKey);
+		HashSet<String> filterSet = new HashSet<String>(filterList);
+		Iterator<Map.Entry<String, Equity>> it = equity.entrySet().iterator();
+		
+		while(it.hasNext()) {
+			Map.Entry<String, Equity> equityEntry = it.next();
+			if( !filterSet.contains(equityEntry.getKey()) ) {
+				it.remove();
 			}
 		}
 	}
