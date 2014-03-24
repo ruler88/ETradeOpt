@@ -55,7 +55,7 @@ public abstract class TradingModelAbstract {
 		return true;
 	}
 	
-	public boolean clearPosition(String eq, double price) {
+	public boolean clearPosition(String eq, double price, Date time) {
 		//sell all position of equity X
 		if(!holdings.containsKey(eq)) {
 			return false;
