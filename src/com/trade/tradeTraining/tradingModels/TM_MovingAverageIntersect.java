@@ -7,9 +7,9 @@ import java.util.List;
 import com.trade.rowData.Equity;
 
 public class TM_MovingAverageIntersect extends TradingModelAbstract {
+	private final int MVperiod = 50;
 	Hashtable<String, MovingAverageVars> MAcache = new Hashtable<String, MovingAverageVars>();
 	
-
 	@Override
 	public void equityFilter(Hashtable<String, Equity> equity) {
 		HashSet<String> filterSet = new HashSet<String>(filterList);
@@ -24,7 +24,6 @@ public class TM_MovingAverageIntersect extends TradingModelAbstract {
 	@Override
 	public void emulateDailyTrade(Hashtable<String, Equity> equityList) {
 		//get data once per minute to get the MA per 30 mins
-		
 		for(String eqKey : equityList.keySet()) {
 			Equity eq = equityList.get(eqKey);
 			if( !eq.isCleanEquity() ) {
@@ -33,33 +32,58 @@ public class TM_MovingAverageIntersect extends TradingModelAbstract {
 			}
 			
 			for(int i=0; i<eq.getTime().size(); i++) {
+				long curTime = eq.getTime().get(i).getTime() % 1000;
+				double ask = eq.getAsk().get(i);
+				double bid = eq.getBid().get(i);
+				if(!MAcache.containsKey(eqKey)) {
+					MAcache.put( eqKey, new MovingAverageVars(ask, 1, curTime, i) );
+					continue;
+				}
 				
-				/*
-				 * for(int i=0; i<var.size();) {
-						movingSum += var.get(i);
-						i++;
-						if(i <= n) {
-							SMA.add(movingSum / i);
-						} else {
-							movingSum -= var.get(headIndex);
-							headIndex++;
-							SMA.add(movingSum / n);
-						}
+				MovingAverageVars MAV = MAcache.get(eqKey);
+				if(curTime <= MAV.lastTime) {
+					continue;
+				}
+				
+				MAV.lastTime = curTime;
+				MAV.movingSum += ask;
+				if(MAV.n < MVperiod) {
+					MAV.n += 1;
+					MAV.updateMA();
+				} else {
+					MAV.movingSum -= eq.getAsk().get(MAV.headIndex);
+					MAV.headIndex += 1;
+					double lastMA = MAV.MA;
+					double thisMA = MAV.updateMA();
+					if( lastMA <= ask && thisMA > ask ) {
+						int quantity = (int) (cashValue / 10 / ask);
+						buyEquity(eqKey, quantity, ask, eq.getTime().get(i));
 					}
-				 */
+					if( lastMA >= ask && thisMA < ask ) {
+						clearPosition(eqKey, bid, eq.getTime().get(i));
+					}
+				}
 			}
 		}
-		
 	}
 	
 	private class MovingAverageVars {
 		public double movingSum;
 		public int n;
-		public float lastTime; //dateTime % 1000
-		public MovingAverageVars (double movingSum, int n, float lastTime) {
+		public long lastTime; //dateTime % 1000
+		public int headIndex;
+		public double MA;
+		public MovingAverageVars (double movingSum, int n, long lastTime, int headIndex) {
 			this.movingSum = movingSum;
 			this.n = n;
 			this.lastTime = lastTime;
+			this.headIndex = headIndex;
+			this.MA = movingSum / n;
+		}
+		
+		public double updateMA() {
+			MA = movingSum / n;
+			return MA;
 		}
 	}
 
