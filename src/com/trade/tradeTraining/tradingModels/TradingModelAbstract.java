@@ -25,6 +25,7 @@ public abstract class TradingModelAbstract {
 	}
 	
 	public boolean buyEquity(String eq, int quantity, double price, Date time) {
+		if(quantity == 0) return false;
 		if(quantity * price > cashValue) {
 			return false;
 		}
@@ -39,6 +40,7 @@ public abstract class TradingModelAbstract {
 	}
 	
 	public boolean sellEquity(String eq, int quantity, double price, Date time) {
+		if(quantity == 0) return false;
 		if(!holdings.containsKey(eq) || holdings.get(eq) < quantity) {
 			return false;
 		}
@@ -50,6 +52,18 @@ public abstract class TradingModelAbstract {
 		} else {
 			holdings.put(eq, holdingQuantity);
 		}
+		return true;
+	}
+	
+	public boolean clearPosition(String eq, double price) {
+		//sell all position of equity X
+		if(!holdings.containsKey(eq)) {
+			return false;
+		}
+		
+		int quantity = holdings.get(eq);
+		cashValue += (quantity * price);
+		holdings.remove(eq);
 		return true;
 	}
 	
