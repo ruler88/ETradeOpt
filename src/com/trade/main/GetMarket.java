@@ -106,6 +106,8 @@ public class GetMarket {
 		GetOption.setPersistList(persistList);
 		GetOption.addExpiringOptions(new MarketClient(request), list);
 		
+		fileWritter.write(Arrays.deepToString(list.toArray()));
+		fileWritter.write("Equity list size: " + list.size());
 		System.err.println(Arrays.deepToString(list.toArray()));
 		System.err.println("Equity list size: " + list.size());
 		//shut down STDOUT to conserve instance RAM
