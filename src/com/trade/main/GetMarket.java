@@ -39,8 +39,10 @@ public class GetMarket {
 	
 	public static final String TZ = "America/New_York";
 	public static String logFile = "/home/ubuntu/dailyLog.log";
+	public static String errFile = "/home/ubuntu/errLog.log";
 	Queue<Integer> dailyHour = new LinkedList<Integer>();
-	FileWriter fileWritter = null;
+	FileWriter logWritter= null;
+	FileWriter errWriter = null;
 	private static Calendar calendar = new GregorianCalendar();
 	private static ConcurrentHashMap<String, StockThread> currentThreads = new ConcurrentHashMap<String, StockThread>();
 	
@@ -79,7 +81,8 @@ public class GetMarket {
 		String oauth_consumer_key = "628c14e46b6744606fdb18fff4b91d33"; // Your consumer key
 		String oauth_consumer_secret = "ede49fab7ad76aa98623278367ef22de"; // Your consumer secret
 		
-		fileWritter = new FileWriter(logFile,true);
+		logWritter = new FileWriter(logFile,true);
+		errWriter = new FileWriter(errFile,true);
 		
 		ClientRequest request = new ClientRequest();
 		request.setEnv(Environment.LIVE);
@@ -106,8 +109,8 @@ public class GetMarket {
 		GetOption.setPersistList(persistList);
 		GetOption.addExpiringOptions(new MarketClient(request), list);
 		
-		fileWritter.write(Arrays.deepToString(list.toArray()));
-		fileWritter.write("Equity list size: " + list.size());
+		logWritter.write(Arrays.deepToString(list.toArray()));
+		logWritter.write("Equity list size: " + list.size());
 		System.err.println(Arrays.deepToString(list.toArray()));
 		System.err.println("Equity list size: " + list.size());
 		//shut down STDOUT to conserve instance RAM
@@ -130,7 +133,7 @@ public class GetMarket {
 		System.setOut(originalStream);
 		System.out.println("\n" + "Trading day over!!\n" + "STDOUT is back on\n");
 		
-		fileWritter.close();
+		logWritter.close();
 	}	
 	
 	public void threadManager(ArrayList<String> list, ClientRequest request) throws InterruptedException {
@@ -182,6 +185,10 @@ public class GetMarket {
 		ArrayList<String> list;
 		
 		public StockThread(ArrayList<String> list, ClientRequest request) {
+			try {
+				logWritter.write("ListSize: " + list.get(0));
+				logWritter.write("ListSize: " + list);
+			} catch (IOException e) { }
 			this.list = list;
 			this.request = request;
 		}
@@ -204,7 +211,7 @@ public class GetMarket {
 							tmpEquity.updateInfo(allInfo);
 						} else {
 							if(symbol.equals("GS")) {
-								fileWritter.write("Writing new GS: " + new Date() );
+								logWritter.write("Writing new GS: " + new Date() );
 							}
 							Equity tmpEquity = new Equity(symbol);
 							tmpEquity.updateInfo(allInfo);
@@ -212,6 +219,7 @@ public class GetMarket {
 						}
 					}
 				} catch ( ETWSException e ) {
+					System.err.println();
 					System.err.println(e.getMessage());
 					System.err.println(e.getErrorMessage());
 					System.err.println(e.getErrorCode());
@@ -264,17 +272,17 @@ public class GetMarket {
 			allEquity = new Hashtable<String, Equity>();
 			dailyHour.poll();
 			try {
-				fileWritter.write("Pre sync time write: " + new Date() );
+				logWritter.write("Pre sync time write: " + new Date() );
 			} catch (IOException e1) { }
 			synchronized(allEquityCopy) {
 				try {
-					fileWritter.write("Post sync time write: " + new Date() );
+					logWritter.write("Post sync time write: " + new Date() );
 					
-					fileWritter.write("\nTrading system is operational! Currently EST " + hour);
+					logWritter.write("\nTrading system is operational! Currently EST " + hour);
 					System.err.println("This is hour: " + hour);
 					
 					DataStorage.serializePartFile(allEquityCopy);
-					fileWritter.write("Post serialize time write: " + new Date() );
+					logWritter.write("Post serialize time write: " + new Date() );
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
