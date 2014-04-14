@@ -1,5 +1,7 @@
 package com.trade.main;
 
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -24,20 +26,32 @@ import com.etrade.etws.sdk.common.ETWSException;
 
 public class GetOption {
 	private static HashSet<String> persistList = new HashSet<String>();	//list of equities that we try to persist if they still exist
+	private static String logFile = "/home/ubuntu/GetOption.log";
+	private static FileWriter fileWritter = null;
 	
 	public static void addExpiringOptions(MarketClient client, List<String> list) throws IOException, ETWSException {
+		if(new File(logFile).exists()) {
+			fileWritter = new FileWriter(logFile, true);
+		}
 		ArrayList<String> expOptions = new ArrayList<String>();
 		OptionExpireDateGetRequest req = new OptionExpireDateGetRequest();
 		for(String underlier : list) {
-			req.setUnderlier(underlier);
-			OptionExpireDateGetResponse response = client.getExpiryDates(req);
-			List<ExpirationDate> allExpDates = response.getExpireDates();
-			if(allExpDates == null || allExpDates.isEmpty()) {
-				continue;	//don't add anything for this underlier equity if system finds fucked up exp dates
-			} else {
-				double underlierPrice = getMostRecentPrice(client, underlier);
-				appendOptionsNearPrice(client, underlier, allExpDates.get(0), expOptions, underlierPrice);
-				appendOptionsNearPrice(client, underlier, allExpDates.get(1), expOptions, underlierPrice);
+			try {
+				req.setUnderlier(underlier);
+				OptionExpireDateGetResponse response = client.getExpiryDates(req);
+				List<ExpirationDate> allExpDates = response.getExpireDates();
+				if(allExpDates == null || allExpDates.isEmpty()) {
+					continue;	//don't add anything for this underlier equity if system finds fucked up exp dates
+				} else {
+					double underlierPrice = getMostRecentPrice(client, underlier);
+					appendOptionsNearPrice(client, underlier, allExpDates.get(0), expOptions, underlierPrice);
+					appendOptionsNearPrice(client, underlier, allExpDates.get(1), expOptions, underlierPrice);
+				}
+			} catch (Exception e) {
+				if(new File(logFile).exists()) {
+					fileWritter.write(underlier + " failed");
+					if(e!=null) fileWritter.write(e.toString());
+				}
 			}
 		}
 		for(String s : expOptions) {
