@@ -57,10 +57,11 @@ public class GetMarket {
 		
 		if(testMode) {
 			//testMode does not run account verification
-			String oauth_access_token = "pGADgoy3iUCjR+/Zrdo4+L+gXlqleD7T5e/THvFIZaU=";
-			String oauth_access_token_secret = "g6N1Jfbk708q13aK2AyCvtoUW79OT6ko+3mwz9JmNho=";
+			String oauth_access_token = "jEqq84pcixZNQwKYuac9lhXrZ2UzyLbos9Duq+Q8qzw=";
+			String oauth_access_token_secret = "4sv6IO5gorh0d1uy5OUJHdsiQ/RHrNQdbCf69p/jKus=";
 			
 			logFile = "/Users/kchao/dailyLog.log";
+			errFile = logFile;
 			GetMarket gm = new GetMarket(oauth_access_token, oauth_access_token_secret);
 		} else {
 			try{
@@ -138,6 +139,12 @@ public class GetMarket {
 	
 	public void threadManager(ArrayList<String> list, ClientRequest request) throws InterruptedException {
 		ArrayList<ArrayList<String>> allThreadsList = TradeUtils.getEquityThreadList(list);
+		for(int i=0; i<allThreadsList.size(); i++) {
+			try {
+				logWritter.write( Arrays.deepToString(allThreadsList.get(i).toArray()) + "\n");
+			} catch (Exception e) { System.err.println(logFile + ", file not found"); }
+			
+		}
 		
 		while( (calendar.get(Calendar.HOUR_OF_DAY) > 8 && calendar.get(Calendar.HOUR_OF_DAY) < 16) 
 				|| testCount > 0) {
@@ -185,10 +192,6 @@ public class GetMarket {
 		ArrayList<String> list;
 		
 		public StockThread(ArrayList<String> list, ClientRequest request) {
-			try {
-				logWritter.write("ListSize: " + list.get(0));
-				logWritter.write("ListSize: " + list);
-			} catch (IOException e) { }
 			this.list = list;
 			this.request = request;
 		}
@@ -198,6 +201,9 @@ public class GetMarket {
 			MarketClient client = new MarketClient(request);
 			try {
 				try{
+//					System.err.println("In List: " + list);
+//					System.err.println("In ListSize: " + list.size());
+//					System.err.println("In ListItem: " + list.get(0));
 					QuoteResponse response = client.getQuote(list, true, DetailFlag.ALL);
 					List<QuoteData> data = response.getQuoteData();
 					for(int i=0; i<data.size(); i++) {
@@ -222,7 +228,7 @@ public class GetMarket {
 					System.err.println();
 					System.err.println(e.getMessage());
 					System.err.println(e.getErrorMessage());
-					System.err.println(e.getErrorCode());
+					System.err.println("Error code: " + e.getErrorCode());
 					e.printStackTrace();
 				}
 			} catch (Exception e) {
