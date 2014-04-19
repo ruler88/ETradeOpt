@@ -42,7 +42,7 @@ public class DataStorage {
 			allEquity = (Hashtable<String, Equity>) in.readObject();
 			in.close();
 			fileIn.close();
-			System.out.println("Deserialization complete: " + fileName);
+			System.err.println("Deserialization complete: " + fileName);
 			return allEquity;
 	    } catch ( Exception e ) {
 	    	System.err.println("deserialization failed: " + fileName);
