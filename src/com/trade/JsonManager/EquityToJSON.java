@@ -1,6 +1,7 @@
 package com.trade.JsonManager;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -13,6 +14,7 @@ import java.util.List;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 import com.trade.main.DataAnalysis;
 import com.trade.rowData.DataStorage;
@@ -23,14 +25,14 @@ public class EquityToJSON {
 	public static final String jsonDir = "/mnt/eqJson/";
 	private static final int summarizationFactor = 62;
 
-	public static void main(String[] args) throws IOException {
+	public static void main(String[] args) throws IOException, ParseException {
 		System.out.println("Equity to JSON started");
-		generateJsonRange("2014020", "20140226");
+		generateJsonRange("20140228", "20140327");
 		System.out.println("COMPLETE");
 	}
 	
 	
-	public static void generateJsonRange(String startTime, String endTime) throws IOException {
+	public static void generateJsonRange(String startTime, String endTime) throws IOException, ParseException {
 		Calendar startDate = Calendar.getInstance();
 		startDate.set(Integer.parseInt(startTime.substring(0, 4)), 
 				Integer.parseInt(startTime.substring(4, 6))-1, 	//minus one 'cause calendar is dumb as shit
@@ -55,7 +57,7 @@ public class EquityToJSON {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public static void generateJson(List<String> filenames, Calendar date) throws IOException {
+	public static void generateJson(List<String> filenames, Calendar date) throws IOException, ParseException {
 		Hashtable<String, Equity> equityMap = new Hashtable<String, Equity>();
 		
 		for( int i=0; i<filenames.size(); i++ ) {
@@ -111,28 +113,22 @@ public class EquityToJSON {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public static void updateDatesEquityJson(List<String> eq, String date) {
-		try {
-			JSONParser parser = new JSONParser();
-			JSONObject jsonObject = (JSONObject) parser.parse(new FileReader(AppendJSON.jsonFileName));
+	public static void updateDatesEquityJson(List<String> eq, String date) throws FileNotFoundException, IOException, ParseException {
+		JSONParser parser = new JSONParser();
+		JSONObject jsonObject = (JSONObject) parser.parse(new FileReader(AppendJSON.jsonFileName));
+		
+		JSONArray dates = (JSONArray) jsonObject.get(AppendJSON.datesName);
+		if( !dates.contains(date) ) {
+			//add to json iff the equity data for that date does not yet exist
+			dates.add(date);
+			jsonObject.put(date, eq);
 			
-			JSONArray dates = (JSONArray) jsonObject.get(AppendJSON.datesName);
-			if( !dates.contains(date) ) {
-				//add to json iff the equity data for that date does not yet exist
-				dates.add(date);
-				jsonObject.put(date, eq);
-				
-				FileWriter file = new FileWriter(AppendJSON.jsonFileName);
-				file.write(jsonObject.toJSONString());
-				file.flush();
-				file.close();
-				
-				System.out.println("Equity lookup JSON written: " + AppendJSON.jsonFileName + ", date: " + date);
-			}
+			FileWriter file = new FileWriter(AppendJSON.jsonFileName);
+			file.write(jsonObject.toJSONString());
+			file.flush();
+			file.close();
 			
-		} catch (Exception e) {
-			//Catch any exceptions here. don't want to break main process if this fails!
-			e.printStackTrace();
+			System.out.println("Equity lookup JSON written: " + AppendJSON.jsonFileName + ", date: " + date);
 		}
 	}
 }
