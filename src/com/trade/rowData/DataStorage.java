@@ -73,7 +73,6 @@ public class DataStorage {
 		        fileOut.close();
 		        out.close();
 		        System.err.println("Part serialization complete, file written to: " + outputName);
-		        updateDatesEquityJson( new ArrayList<String>(allEquity.keySet()) );
 	    	}
 		} catch (Exception e) {
 			try{
@@ -87,7 +86,6 @@ public class DataStorage {
 			        fileOut.close();
 			        out.close();
 			        System.err.println("EMERGENCY serialization complete, file written to: " + outputName);
-			        updateDatesEquityJson( new ArrayList<String>(allEquity.keySet()) );
 			        Notifier.sendEmail("helloworld0424@gmail.com", "Etrade emergency file dump activated", e.getMessage());
 				}
 			} catch (Exception reallyFailed) {
@@ -135,32 +133,6 @@ public class DataStorage {
 			System.err.println("Persist Equity serialization failed: " + e.getMessage());
 		}
 		
-	}
-	
-	@SuppressWarnings("unchecked")
-	public static void updateDatesEquityJson(List<String> eq) {
-		try {
-			Date today = new Date();
-			String date = dateFormat.format(today);
-			JSONParser parser = new JSONParser();
-			JSONObject jsonObject = (JSONObject) parser.parse(new FileReader(AppendJSON.jsonFileName));
-			
-			JSONArray dates = (JSONArray) jsonObject.get(AppendJSON.datesName);
-			if( !dates.contains(date) ) {
-				//add to json iff the equity data for that date does not yet exist
-				dates.add(date);
-				jsonObject.put(date, eq);
-				
-				FileWriter file = new FileWriter(AppendJSON.jsonFileName);
-				file.write(jsonObject.toJSONString());
-				file.flush();
-				file.close();
-			}
-			
-		} catch (Exception e) {
-			//Catch any exceptions here. don't want to break main process if this fails!
-			e.printStackTrace();
-		}
 	}
 	
 	private static void printMapEq(Hashtable<String, Equity> allEquities) {

@@ -1,6 +1,7 @@
 package com.trade.JsonManager;
 
 import java.io.File;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -9,7 +10,9 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 
 import com.trade.main.DataAnalysis;
 import com.trade.rowData.DataStorage;
@@ -21,8 +24,9 @@ public class EquityToJSON {
 	private static final int summarizationFactor = 62;
 
 	public static void main(String[] args) throws IOException {
-		System.out.println("TEST");
-		generateJsonRange("20140320", "20140322");
+		System.out.println("Equity to JSON started");
+		generateJsonRange("2014020", "20140226");
+		System.out.println("COMPLETE");
 	}
 	
 	
@@ -85,6 +89,8 @@ public class EquityToJSON {
 			
 			System.out.println("File written to: " + outputDir.toString());
 		}
+		
+		updateDatesEquityJson(new ArrayList(equityMap.keySet()), DataStorage.dateFormat.format(date.getTime()));
 	}
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
@@ -102,5 +108,31 @@ public class EquityToJSON {
 		}
 		
 		return json;
+	}
+	
+	@SuppressWarnings("unchecked")
+	public static void updateDatesEquityJson(List<String> eq, String date) {
+		try {
+			JSONParser parser = new JSONParser();
+			JSONObject jsonObject = (JSONObject) parser.parse(new FileReader(AppendJSON.jsonFileName));
+			
+			JSONArray dates = (JSONArray) jsonObject.get(AppendJSON.datesName);
+			if( !dates.contains(date) ) {
+				//add to json iff the equity data for that date does not yet exist
+				dates.add(date);
+				jsonObject.put(date, eq);
+				
+				FileWriter file = new FileWriter(AppendJSON.jsonFileName);
+				file.write(jsonObject.toJSONString());
+				file.flush();
+				file.close();
+				
+				System.out.println("Equity lookup JSON written: " + AppendJSON.jsonFileName + ", date: " + date);
+			}
+			
+		} catch (Exception e) {
+			//Catch any exceptions here. don't want to break main process if this fails!
+			e.printStackTrace();
+		}
 	}
 }

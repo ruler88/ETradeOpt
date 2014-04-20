@@ -26,14 +26,6 @@ public class TestDataStorage {
 		testEquity.addInfo(new Date(), 115.0, 110.0, 25l, 42l, 15l, 36l);
 		testEquity.addInfo(new Date(), 115.0, 112.0, 15l, 22l, 16l, 40l);
 	}
-
-	@Test
-	public void testUpdateDatesEquityJson() {
-		List<String> eqDummy = new ArrayList<String>();
-		eqDummy.add("GOOG");
-		eqDummy.add("BS");
-		DataStorage.updateDatesEquityJson(eqDummy);
-	}
 	
 	@Test
 	public void testSerializePartFile() throws Exception {
