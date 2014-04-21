@@ -2,12 +2,18 @@ package com.trade.main;
 
 import java.io.File;
 import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Set;
+
+import net.objectlab.kit.datecalc.common.DefaultHolidayCalendar;
+import net.objectlab.kit.datecalc.jdk.CalendarDateCalculator;
+import net.objectlab.kit.datecalc.jdk.CalendarForwardHandler;
 
 import com.trade.rowData.DataStorage;
 import com.trade.rowData.Equity;
@@ -95,17 +101,16 @@ public class DataAnalysis {
 	
 	//get all files within date range
 	public static List<String> getMarketFiles(String startTime, String endTime) {
-		Calendar startDate = Calendar.getInstance();
-		startDate.set(Integer.parseInt(startTime.substring(0, 4)), 
+		Calendar startDate = new GregorianCalendar(Integer.parseInt(startTime.substring(0, 4)),
 				Integer.parseInt(startTime.substring(4, 6))-1, 	//minus one 'cause calendar is dumb as shit
 				Integer.parseInt(startTime.substring(6)));
 		
-		Calendar endDate = Calendar.getInstance();
-		endDate.set(Integer.parseInt(endTime.substring(0, 4)), 
+		Calendar endDate = new GregorianCalendar(Integer.parseInt(endTime.substring(0, 4)), 
 				Integer.parseInt(endTime.substring(4, 6))-1, 
 				Integer.parseInt(endTime.substring(6)));
 		
 		List<String> fileNames = new ArrayList<String>();
+		
 		
 		while(startDate.before(endDate) || startDate.equals(endDate)) {
 			File fileDir = new File( dataHeadDir + 
@@ -113,11 +118,41 @@ public class DataAnalysis {
 			
 			if(fileDir.isDirectory()) {
 				fileNames.addAll(getDayFile(fileDir));
+			} else {
+				CalendarDateCalculator dateCalc = getDateCalc();
+				
+				if(!dateCalc.isNonWorkingDay(startDate)) {
+					System.err.println("ERROR: missing data on working day: " + timeFileDir.format(startDate.getTime()));
+				}
 			}
 			startDate.add(Calendar.DATE, 1);
 		}
 		
 		return fileNames;
+	}
+	
+	public static CalendarDateCalculator getDateCalc() {
+		Set<Calendar> holidayDates = new HashSet<Calendar>();
+		//remember that 0=Jan, 11=Dec
+		holidayDates.add(new GregorianCalendar(2014,0,1));	//new years
+		holidayDates.add(new GregorianCalendar(2014,0,20));	//MLK
+		holidayDates.add(new GregorianCalendar(2014,1,17));	//Washington bday
+		holidayDates.add(new GregorianCalendar(2014,3,18));	//Good Friday
+		holidayDates.add(new GregorianCalendar(2014,4,26));	//Memorial Day -- May 26, 2014
+		holidayDates.add(new GregorianCalendar(2014,6,4));	//Independence Day -- July 4, 2014
+		holidayDates.add(new GregorianCalendar(2014,8,1));	//Labor Day -- September 1, 2014
+		holidayDates.add(new GregorianCalendar(2014,10,27));	//Thanksgiving Day -- November 27, 2014
+		holidayDates.add(new GregorianCalendar(2014,11,25));	//Christmas Day -- December 25, 2014
+		holidayDates.add(new GregorianCalendar(2015,0,1));	//New Year's Day -- January 1, 2015
+		holidayDates.add(new GregorianCalendar(2015,0,2));	//Place holder to remind
+		
+		
+		//calendarDateCalc figures out if the date is business day
+		CalendarForwardHandler cfh = new CalendarForwardHandler();
+		DefaultHolidayCalendar<Calendar> dhc = new DefaultHolidayCalendar<Calendar>(holidayDates);
+		CalendarDateCalculator dateCalc = new CalendarDateCalculator("HolidayCalc", Calendar.getInstance(), dhc, cfh);
+		
+		return dateCalc;
 	}
 	
 	// helper for getMarketFiles
