@@ -14,7 +14,7 @@ public abstract class TradingModelAbstract {
 	
 	public abstract void equityFilter(Hashtable<String,Equity> equityList);
 	
-	public abstract void emulateDailyTrade(Hashtable<String,Equity> equityList);
+	public abstract void emulateDailyTrade(Hashtable<String,Equity> equityList) throws Throwable;
 	
 	public void setFilter(List<String> filterList) {
 		this.filterList = filterList;
@@ -65,6 +65,10 @@ public abstract class TradingModelAbstract {
 		cashValue += (quantity * price);
 		holdings.remove(eq);
 		return true;
+	}
+	
+	public float getValue() {
+		return cashValue;
 	}
 	
 }
