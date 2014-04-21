@@ -42,7 +42,6 @@ public class DataAnalysis {
 		for(String name : files) {
 			Hashtable<String, Equity> oneDayEquity = DataStorage.deserializeFile(name);
 			for(String s : oneDayEquity.keySet()) {
-				if(!s.equals("GS:2014:3:22:CALL:165.00") && !s.equals("GS")) continue;
 				Equity tmpEquity = oneDayEquity.get(s);
 				System.err.println(tmpEquity.toString());
 				if( tmpEquity.getAsk().size() == 0 ) {
