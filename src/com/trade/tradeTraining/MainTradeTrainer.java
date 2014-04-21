@@ -13,7 +13,7 @@ import com.trade.tradeTraining.tradingModels.TradingModelAbstract;
 public class MainTradeTrainer {
 	//change these variables for trade simulation
 	//private static final String startDate = "20140321";
-	private static final String startDate = "20140401";
+	private static final String startDate = "20140301";
 	private static final String endDate =   "20140401";
 	private static final float capital = 10000;
 	private static final List<String> filterList = new ArrayList<String>();
@@ -38,7 +38,7 @@ public class MainTradeTrainer {
 			tradingModel.emulateDailyTrade(dailyEq);
 		}
 		
-		System.out.println("Trade simulation COMPLETE: " + tradingModel.getValue());
+		System.out.println("Trade simulation COMPLETE,\nfinal capital: " + tradingModel.getValue());
 	}
 
 }
