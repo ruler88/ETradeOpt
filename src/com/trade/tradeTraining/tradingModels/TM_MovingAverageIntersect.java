@@ -1,15 +1,22 @@
 package com.trade.tradeTraining.tradingModels;
 
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 
 import com.trade.rowData.Equity;
 
 public class TM_MovingAverageIntersect extends TradingModelAbstract {
+	public TM_MovingAverageIntersect(String startDate, String endDate,
+			String modelName, List<String> filterList) throws IOException {
+		super(startDate, endDate, modelName, filterList);
+	}
+
 	private final int MVperiod = 30;
 	Hashtable<String, MovingAverageVars> MAcache = new Hashtable<String, MovingAverageVars>();
 	
@@ -53,8 +60,7 @@ public class TM_MovingAverageIntersect extends TradingModelAbstract {
 					continue;
 				}
 				
-				System.out.println(MAV);
-				
+				//updating moving average as the simulation goes forward
 				MAV.lastTime = curTime;
 				MAV.movingSum += ask;
 				if(MAV.n < MVperiod) {

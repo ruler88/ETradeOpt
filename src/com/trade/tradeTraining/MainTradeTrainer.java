@@ -14,7 +14,7 @@ public class MainTradeTrainer {
 	//change these variables for trade simulation
 	//private static final String startDate = "20140321";
 	private static final String startDate = "20140413";
-	private static final String endDate =   "20140414";
+	private static final String endDate =   "20140418";
 	private static final float capital = 10000;
 	private static final List<String> filterList = new ArrayList<String>();
 	

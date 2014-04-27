@@ -25,7 +25,8 @@ public abstract class TradingModelAbstract {
 			String modelName, List<String> filterList) throws IOException {
 		//This constructor creates the record csv file
 		String fileName = modelName + ":" + startDate + "-" + endDate + ".csv";
-		File outputFile = new File(csvFileName + fileName);
+		csvFileName += fileName;
+		File outputFile = new File(csvFileName);
 		outputFile.delete();
 		outputFile.createNewFile();
 		
@@ -34,7 +35,7 @@ public abstract class TradingModelAbstract {
 		csvWriter.write("Filter list - \n");
 		for(String s : filterList) csvWriter.write(s + "\n");
 		csvWriter.write("\n\n");
-		csvWriter.write("Transaction,Equity,Price,Quantity,Time,Capital" + "\n");
+		csvWriter.write("Transaction,Equity,Price,Quantity,Time,Delta,Capital" + "\n");
 	}
 	
 	public void setFilter(List<String> filterList) {
@@ -57,7 +58,7 @@ public abstract class TradingModelAbstract {
 		} else {
 			holdings.put(eq, quantity);
 		}
-		csvWriter.write("Buy,"+eq+","+price+","+quantity+","+time + "\n");
+		csvWriter.write("Buy,"+eq+","+price+","+quantity+","+time+","+(quantity * price * -1)+","+cashValue+"\n");
 		return true;
 	}
 	
@@ -74,7 +75,7 @@ public abstract class TradingModelAbstract {
 		} else {
 			holdings.put(eq, holdingQuantity);
 		}
-		csvWriter.write("Sell,"+eq+","+price+","+quantity+","+time + "\n");
+		csvWriter.write("Buy,"+eq+","+price+","+quantity+","+time+","+(quantity * price)+","+cashValue+"\n");
 		return true;
 	}
 	
@@ -95,7 +96,7 @@ public abstract class TradingModelAbstract {
 	}
 	
 	public void finish() throws IOException {
-		System.out.println("Finish called from TradingModelAbstract");
+		System.out.println("Record written to " + csvFileName);
 		csvWriter.flush();
 		csvWriter.close();
 	}
