@@ -59,6 +59,7 @@ public abstract class TradingModelAbstract {
 			holdings.put(eq, quantity);
 		}
 		csvWriter.write("Buy,"+eq+","+price+","+quantity+","+time+","+(quantity * price * -1)+","+cashValue+"\n");
+		System.out.println("Buy,"+eq+","+price+","+quantity+","+time+","+(quantity * price)+","+cashValue+"\n");
 		return true;
 	}
 	
@@ -75,7 +76,8 @@ public abstract class TradingModelAbstract {
 		} else {
 			holdings.put(eq, holdingQuantity);
 		}
-		csvWriter.write("Buy,"+eq+","+price+","+quantity+","+time+","+(quantity * price)+","+cashValue+"\n");
+		csvWriter.write("Sell,"+eq+","+price+","+quantity+","+time+","+(quantity * price)+","+cashValue+"\n");
+		System.out.println("Sell,"+eq+","+price+","+quantity+","+time+","+(quantity * price)+","+cashValue+"\n");
 		return true;
 	}
 	
