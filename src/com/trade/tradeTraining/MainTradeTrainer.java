@@ -13,16 +13,17 @@ import com.trade.tradeTraining.tradingModels.TradingModelAbstract;
 public class MainTradeTrainer {
 	//change these variables for trade simulation
 	//private static final String startDate = "20140321";
-	private static final String startDate = "20140301";
-	private static final String endDate =   "20140401";
+	private static final String startDate = "20140413";
+	private static final String endDate =   "20140414";
 	private static final float capital = 10000;
 	private static final List<String> filterList = new ArrayList<String>();
 	
 	//CHANGE trading model class to use different models
-	private final TradingModelAbstract tradingModel = new TM_MovingAverageIntersect();
+	private static TradingModelAbstract tradingModel;
 	
 	public static void main(String[] args) throws Throwable {
 		filterList.add("GS");
+		tradingModel = new TM_MovingAverageIntersect(startDate, endDate, TM_MovingAverageIntersect.class.getSimpleName(), filterList);
 		new MainTradeTrainer();
 	}
 	
@@ -38,6 +39,7 @@ public class MainTradeTrainer {
 			tradingModel.emulateDailyTrade(dailyEq);
 		}
 		
+		tradingModel.finish();
 		System.out.println("Trade simulation COMPLETE,\nfinal capital: " + tradingModel.getValue());
 	}
 
