@@ -22,7 +22,7 @@ public abstract class TradingModelAbstract {
 	public abstract void emulateDailyTrade(Hashtable<String,Equity> equityList) throws Throwable;
 	
 	public TradingModelAbstract(String startDate, String endDate, 
-			String modelName, List<String> filterList) throws IOException {
+		String modelName, List<String> filterList) throws IOException {
 		//This constructor creates the record csv file
 		String fileName = modelName + ":" + startDate + "-" + endDate + ".csv";
 		csvFileName += fileName;
@@ -81,16 +81,14 @@ public abstract class TradingModelAbstract {
 		return true;
 	}
 	
-	public boolean clearPosition(String eq, double price, Date time) {
+	public boolean clearPosition(String eq, double price, Date time) throws IOException {
 		//sell all position of equity X
 		if(!holdings.containsKey(eq)) {
 			return false;
 		}
 		
 		int quantity = holdings.get(eq);
-		cashValue += (quantity * price);
-		holdings.remove(eq);
-		return true;
+		return sellEquity(eq, quantity, price, time);
 	}
 	
 	public float getValue() {

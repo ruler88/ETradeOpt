@@ -1,5 +1,7 @@
 package com.trade.tradeTraining.tradingModels;
 
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -12,9 +14,19 @@ import java.util.Queue;
 import com.trade.rowData.Equity;
 
 public class TM_MovingAverageIntersect extends TradingModelAbstract {
+	private String csvFileName = "/mnt/tradingSim/MATracker.csv";
+	private FileWriter csvWriter;
+	
 	public TM_MovingAverageIntersect(String startDate, String endDate,
 			String modelName, List<String> filterList) throws IOException {
 		super(startDate, endDate, modelName, filterList);
+		
+		//tracking output csv
+		File outputFile = new File(csvFileName);
+		outputFile.delete();
+		outputFile.createNewFile();
+		csvWriter = new FileWriter(csvFileName);
+		csvWriter.write("Equity,Time,Ask,Bid,LastMA,ThisMA" + "\n");
 	}
 
 	private final int MVperiod = 30;
@@ -46,16 +58,14 @@ public class TM_MovingAverageIntersect extends TradingModelAbstract {
 			}
 			
 			for(int i=0; i<eq.getTime().size(); i++) {
-				long curTime = eq.getTime().get(i).getTime() / 1000;
+				long curTime = eq.getTime().get(i).getTime() / 1000 / 60;	//check every minute
 				double ask = eq.getAsk().get(i);
 				double bid = eq.getBid().get(i);
 				if(!MAcache.containsKey(eqKey)) {
 					MAcache.put( eqKey, new MovingAverageVars(ask, 1, curTime) );
 					continue;
 				}
-				
 				MovingAverageVars MAV = MAcache.get(eqKey);
-				//System.out.println("CurTime: " + curTime + " lastTIme: " + MAV.lastTime);
 				if(curTime <= MAV.lastTime) {
 					continue;
 				}
@@ -70,8 +80,9 @@ public class TM_MovingAverageIntersect extends TradingModelAbstract {
 					MAV.movingSum -= MAV.priceQueue.poll();
 					double lastMA = MAV.MA;
 					double thisMA = MAV.updateMA(ask);
+					csvWriter.write(eqKey+","+eq.getTime().get(i)+","+ask+","+bid+","+lastMA+","+thisMA +"\n");
 					if( lastMA <= ask && thisMA > ask ) {
-						int quantity = (int) (cashValue / 10 / ask);
+						int quantity = (int) (cashValue / 8 / ask);
 						buyEquity(eqKey, quantity, ask, eq.getTime().get(i));
 					}
 					if( lastMA >= ask && thisMA < ask ) {
@@ -80,6 +91,7 @@ public class TM_MovingAverageIntersect extends TradingModelAbstract {
 				}
 			}
 		}
+		csvWriter.flush();
 	}
 	
 	private class MovingAverageVars {
