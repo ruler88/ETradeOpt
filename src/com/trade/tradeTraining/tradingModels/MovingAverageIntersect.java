@@ -9,15 +9,18 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
 
 import com.trade.rowData.Equity;
 
-public class TM_MovingAverageIntersect extends TradingModelAbstract {
+public class MovingAverageIntersect extends TradingModelAbstract {
+	private final int MVperiod = 40;
+	Hashtable<String, MovingAverageVars> MAcache = new Hashtable<String, MovingAverageVars>();
+	
 	private String csvFileName = "/mnt/tradingSim/MATracker.csv";
 	private FileWriter csvWriter;
 	
-	public TM_MovingAverageIntersect(String startDate, String endDate,
+	
+	public MovingAverageIntersect(String startDate, String endDate,
 			String modelName, List<String> filterList) throws IOException {
 		super(startDate, endDate, modelName, filterList);
 		
@@ -28,9 +31,6 @@ public class TM_MovingAverageIntersect extends TradingModelAbstract {
 		csvWriter = new FileWriter(csvFileName);
 		csvWriter.write("Equity,Time,Ask,Bid,ThisMA" + "\n");
 	}
-
-	private final int MVperiod = 30;
-	Hashtable<String, MovingAverageVars> MAcache = new Hashtable<String, MovingAverageVars>();
 	
 	@Override
 	public void equityFilter(Hashtable<String, Equity> equity) {
@@ -89,7 +89,6 @@ public class TM_MovingAverageIntersect extends TradingModelAbstract {
 						clearPosition(eqKey, bid, eq.getTime().get(i));
 					}
 				}
-				
 				equityValueCache.put(eqKey, ask);
 			}
 		}
