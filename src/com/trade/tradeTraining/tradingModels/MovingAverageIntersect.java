@@ -12,6 +12,11 @@ import java.util.Map;
 
 import com.trade.rowData.Equity;
 
+/*
+ * This model trades base on SMA
+ * When the price exceeds SMA, buy equity; when price falls short of SMA, sell equity
+ * @Change MVperiod for # of minutes in the moving average calculation
+ */
 public class MovingAverageIntersect extends TradingModelAbstract {
 	private final int MVperiod = 40;
 	Hashtable<String, MovingAverageVars> MAcache = new Hashtable<String, MovingAverageVars>();
