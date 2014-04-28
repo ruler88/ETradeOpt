@@ -26,7 +26,7 @@ public class TM_MovingAverageIntersect extends TradingModelAbstract {
 		outputFile.delete();
 		outputFile.createNewFile();
 		csvWriter = new FileWriter(csvFileName);
-		csvWriter.write("Equity,Time,Ask,Bid,LastMA,ThisMA" + "\n");
+		csvWriter.write("Equity,Time,Ask,Bid,ThisMA" + "\n");
 	}
 
 	private final int MVperiod = 30;
@@ -78,14 +78,14 @@ public class TM_MovingAverageIntersect extends TradingModelAbstract {
 					MAV.updateMA(ask);
 				} else {
 					MAV.movingSum -= MAV.priceQueue.poll();
-					double lastMA = MAV.MA;
+					double lastAsk = MAV.priceQueue.getLast();
 					double thisMA = MAV.updateMA(ask);
-					csvWriter.write(eqKey+","+eq.getTime().get(i)+","+ask+","+bid+","+lastMA+","+thisMA +"\n");
-					if( lastMA <= ask && thisMA > ask ) {
+					csvWriter.write(eqKey+","+eq.getTime().get(i)+","+ask+","+bid+","+thisMA +"\n");
+					if( thisMA >= lastAsk && thisMA < ask ) {
 						int quantity = (int) (cashValue / 8 / ask);
 						buyEquity(eqKey, quantity, ask, eq.getTime().get(i));
 					}
-					if( lastMA >= ask && thisMA < ask ) {
+					if( thisMA <= lastAsk && thisMA > ask ) {
 						clearPosition(eqKey, bid, eq.getTime().get(i));
 					}
 				}
@@ -99,7 +99,7 @@ public class TM_MovingAverageIntersect extends TradingModelAbstract {
 		private int n;
 		private long lastTime; //dateTime / 1000
 		private double MA;
-		private final Queue<Double> priceQueue = new LinkedList<Double>();
+		private final LinkedList<Double> priceQueue = new LinkedList<Double>();
 		
 		public MovingAverageVars (double movingSum, int n, long lastTime) {
 			this.movingSum = movingSum;
