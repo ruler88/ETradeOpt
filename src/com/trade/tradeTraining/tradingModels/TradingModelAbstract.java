@@ -13,7 +13,10 @@ import com.trade.rowData.Equity;
 public abstract class TradingModelAbstract {
 	protected List<String> filterList;
 	protected float cashValue;			//cash on hand
+	protected float equityValue;		//equity value based on closing day value
 	protected HashMap<String, Integer> holdings = new HashMap<String, Integer>();
+	protected HashMap<String, Double> equityValueCache = new HashMap<String, Double>();
+	
 	private String csvFileName = "/mnt/tradingSim/";
 	private FileWriter csvWriter;
 	
@@ -91,11 +94,20 @@ public abstract class TradingModelAbstract {
 		return sellEquity(eq, quantity, price, time);
 	}
 	
-	public float getValue() {
+	public float getCashValue() {
 		return cashValue;
 	}
 	
+	public float getEquityValue() {
+		for(String s : holdings.keySet()) {
+			Integer quantity = holdings.get(s);
+			equityValue += equityValueCache.get(s) * quantity;
+		}
+		return equityValue;
+	}
+	
 	public void finish() throws IOException {
+		getEquityValue();
 		System.out.println("Record written to " + csvFileName);
 		csvWriter.flush();
 		csvWriter.close();

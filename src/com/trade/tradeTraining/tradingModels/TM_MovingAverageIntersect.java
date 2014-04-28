@@ -89,6 +89,8 @@ public class TM_MovingAverageIntersect extends TradingModelAbstract {
 						clearPosition(eqKey, bid, eq.getTime().get(i));
 					}
 				}
+				
+				equityValueCache.put(eqKey, ask);
 			}
 		}
 		csvWriter.flush();

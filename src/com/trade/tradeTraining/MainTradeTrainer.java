@@ -13,8 +13,8 @@ import com.trade.tradeTraining.tradingModels.TradingModelAbstract;
 public class MainTradeTrainer {
 	//change these variables for trade simulation
 	//private static final String startDate = "20140321";
-	private static final String startDate = "20140413";
-	private static final String endDate =   "20140418";
+	private static final String startDate = "20140310";
+	private static final String endDate =   "20140312";
 	private static final float capital = 10000;
 	private static final List<String> filterList = new ArrayList<String>();
 	
@@ -40,7 +40,7 @@ public class MainTradeTrainer {
 		}
 		
 		tradingModel.finish();
-		System.out.println("Trade simulation COMPLETE,\nfinal capital: " + tradingModel.getValue());
+		System.out.println("Trade simulation COMPLETE,\nfinal capital: " + tradingModel.getCashValue() + tradingModel.getEquityValue());
 	}
 
 }
