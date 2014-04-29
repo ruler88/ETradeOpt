@@ -12,9 +12,16 @@ import java.util.Map;
 
 import com.trade.rowData.Equity;
 
+//TODO: make comments about this model
+
 public class LowPassFilterModel extends TradingModelAbstract {
-	private final double ALPHA = 0.2;		//alpha var for LPF, the lower the value, the more smooth the output
-	private HashMap<String, Double> filterCache = new HashMap<String, Double>(); 	//cache of latest filter output
+	private final float ALPHA = 0.8f;		//alpha var for LPF, the lower the value, the more smooth the output
+	private HashMap<String, HashMap<String, Long>> filterCache = new HashMap<String, HashMap<String, Long>>(); 	//cache of latest filter output, second layer of map contains BID,ASK,or BIDASKDIFF
+
+	//some model constants
+	private static final String BID = "BID";
+	private static final String ASK = "ASK";
+	private static final String BIDASKDIFF = "BIDASKDIFF";
 	
 	private String csvFileName = "/mnt/tradingSim/MATracker.csv";
 	private FileWriter csvWriter;
@@ -27,7 +34,7 @@ public class LowPassFilterModel extends TradingModelAbstract {
 		outputFile.delete();
 		outputFile.createNewFile();
 		csvWriter = new FileWriter(csvFileName);
-		csvWriter.write("Equity,Time,Ask,Bid,AskFilter" + "\n");
+		csvWriter.write("Equity,Time,AskSize,AskFilter,BidSize,BidFilter,BidAskDiffSize,BidAskFilter,AskPrice" + "\n");
 	}
 
 	@Override
@@ -42,38 +49,43 @@ public class LowPassFilterModel extends TradingModelAbstract {
 			
 			long lastTime = 0;
 			for(int i=0; i<eq.getTime().size(); i++) {
-				long curTime = eq.getTime().get(i).getTime() / 1000 / 60;	//check every minute
-				double ask = eq.getAsk().get(i);
-				double bid = eq.getBid().get(i);
+				long curTime = eq.getTime().get(i).getTime() / 1000 / 30;	//check every 30s
+				long askSize = eq.getAskSize().get(i);
+				long bidSize = eq.getBidSize().get(i);
 				
 				if(curTime <= lastTime) {
 					continue;
 				}
 				
 				if(!filterCache.containsKey(eqKey)) {
-					filterCache.put(eqKey, ask);
+					HashMap<String, Long> cacheVars = new HashMap<String, Long>();
+					cacheVars.put(ASK, askSize);
+					cacheVars.put(BID, bidSize);
+					cacheVars.put(BIDASKDIFF, bidSize-askSize);
+					
+					filterCache.put(eqKey, cacheVars);
 				} else {
-					//TODO: do decision here
-					double filterOutput = LowPassFilterHelperB(ask, eqKey);	//change for different methods
-					csvWriter.write(eqKey+","+eq.getTime().get(i)+","+ask+","+bid+","+filterOutput+"\n");
+					HashMap<String, Long> cacheVars = filterCache.get(eqKey);
+					long askCache = (long) (cacheVars.get(ASK) * ALPHA + askSize * (1-ALPHA));
+					long bidCache = (long) (cacheVars.get(BID) * ALPHA + bidSize * (1-ALPHA));
+					long bidAskCache = (long) (cacheVars.get(BIDASKDIFF) * ALPHA + (bidSize-askSize) * (1-ALPHA));
+					
+					cacheVars.put(ASK, askCache);
+					cacheVars.put(BID, bidCache);
+					cacheVars.put(BIDASKDIFF, bidAskCache);
+					
+					//csvWriter.write("Equity,Time,Ask,AskFilter,Bid,BidFilter,BidAskDiff,BidAskFilter" + "\n");
+					csvWriter.write(eqKey+","+eq.getTime().get(i)+","+askSize+","+askCache+","+
+							bidSize+","+bidCache+","+(bidSize-askSize)+","+bidAskCache+","+ 
+							eq.getAsk().get(i)+"\n");
+					
+					filterCache.put(eqKey, cacheVars);
 				}
 				
-				equityValueCache.put(eqKey, ask);
+				equityValueCache.put(eqKey, eq.getAsk().get(i));
 			}
 		}
 		csvWriter.flush();
-	}
-	
-	private double LowPassFilterHelperA(double ask, String eqKey) {
-		double filterOutput = filterCache.get(eqKey) * ALPHA + ask * (1-ALPHA);
-		filterCache.put(eqKey, filterOutput);
-		return filterOutput;
-	}
-	
-	private double LowPassFilterHelperB(double ask, String eqKey) {
-		double filterOutput = filterCache.get(eqKey) + ALPHA * (ask - filterCache.get(eqKey));
-		filterCache.put(eqKey, filterOutput);
-		return filterOutput;
 	}
 	
 	@Override
