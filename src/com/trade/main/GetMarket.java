@@ -10,7 +10,6 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Hashtable;
-import java.util.Iterator;
 import java.util.List;
 import java.util.TimeZone;
 import java.util.concurrent.ConcurrentHashMap;
@@ -89,24 +88,6 @@ public class GetMarket {
 		request.setToken(oauth_access_token);
 		request.setTokenSecret(oauth_access_token_secret);
 		
-		ArrayList<String> list = new ArrayList<String>();
-		list.add("TWTR");
-		list.add("VZ");
-		list.add("GOOG");
-		list.add("GE");
-		list.add("AAPL");
-		list.add("GS");
-		list.add("F");
-		list.add("RIO");
-		list.add("AMZN");
-		list.add("TSLA");
-		
-		List<String> persistList = DataStorage.deserializePersistEquity();	//get the old equity list
-		GetOption.setPersistList(persistList);
-		GetOption.addExpiringOptions(new MarketClient(request), list);
-		
-		System.err.println(Arrays.deepToString(list.toArray()));
-		System.err.println("Equity list size: " + list.size());
 		//shut down STDOUT to conserve instance RAM
 		System.err.println("\nTrading system starting!!!");
 		System.err.println("STDOUT is shutting down");
@@ -118,32 +99,24 @@ public class GetMarket {
 		});
 		System.setOut(dummyStream);
 		
-		threadManager(list, request);
+		//process the market requests
+		threadManager(request);
 		
-		//persist today's equity list for tomorrow
-		DataStorage.serializePersistEquity(list);
-		
-		//turn STDOUT back on
+		//turn STDOUT back on (should not be called given new implementation, keeping around for changes)
 		System.setOut(originalStream);
 		System.out.println("\n" + "Trading day over!!\n" + "STDOUT is back on\n");
 		logWritter.flush();
 		logWritter.close();
 	}	
 	
-	public void threadManager(ArrayList<String> list, ClientRequest request) throws InterruptedException {
-		ArrayList<ArrayList<String>> allThreadsList = TradeUtils.getEquityThreadList(list);
-		for(int i=0; i<allThreadsList.size(); i++) {
-			try {
-				//logging all eqs for the day
-				logWritter.write( Arrays.deepToString(allThreadsList.get(i).toArray()) + "\n");
-				logWritter.flush();
-			} catch (Exception e) { System.err.println(logFile + ", file not found"); }
-			
-		}
-		
+	public void threadManager(ClientRequest request) throws InterruptedException, IOException, ETWSException {
+		ArrayList<ArrayList<String>> allThreadsList = updateEquityList(request);
 		while( true ) {
 			calendar = Calendar.getInstance(TimeZone.getTimeZone(TZ));
 			timeCheck(calendar.get(Calendar.HOUR_OF_DAY));	//log current time on the hour
+			if(calendar.get(Calendar.HOUR_OF_DAY) == 9) {
+				allThreadsList = updateEquityList(request);
+			}
 			
 			for(int i=0; i<allThreadsList.size(); i++) {
 				Thread.sleep(250);
@@ -251,6 +224,41 @@ public class GetMarket {
 			}
 			return false;
 		}
+	}
+	
+	//this method returns the latest equity list given daily option changes
+	private ArrayList<ArrayList<String>> updateEquityList(ClientRequest request) throws IOException, ETWSException {
+		ArrayList<String> list = new ArrayList<String>();
+		list.add("TWTR");
+		list.add("VZ");
+		list.add("GOOG");
+		list.add("GE");
+		list.add("AAPL");
+		list.add("GS");
+		list.add("F");
+		list.add("RIO");
+		list.add("AMZN");
+		list.add("TSLA");
+		
+		List<String> persistList = DataStorage.deserializePersistEquity();	//get the old equity list
+		GetOption.setPersistList(persistList);
+		GetOption.addExpiringOptions(new MarketClient(request), list);
+		
+		System.err.println(Arrays.deepToString(list.toArray()));
+		System.err.println("Equity list size: " + list.size());
+		//persist today's equity list for tomorrow
+		DataStorage.serializePersistEquity(list);
+		
+		ArrayList<ArrayList<String>> allThreadsList = TradeUtils.getEquityThreadList(list);
+		for(int i=0; i<allThreadsList.size(); i++) {
+			try {
+				//logging all eqs for the day
+				logWritter.write( Arrays.deepToString(allThreadsList.get(i).toArray()) + "\n");
+				logWritter.flush();
+			} catch (Exception e) { System.err.println(logFile + ", file not found"); }
+		}
+		
+		return allThreadsList;
 	}
 	
 	private String getFirstString(ArrayList<String> arr) {
