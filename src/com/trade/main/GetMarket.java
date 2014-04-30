@@ -8,13 +8,10 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Hashtable;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
 import java.util.TimeZone;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -40,7 +37,7 @@ public class GetMarket {
 	public static final String TZ = "America/New_York";
 	public static String logFile = "/home/ubuntu/dailyLog.log";
 	public static String errFile = "/home/ubuntu/errLog.log";
-	Queue<Integer> dailyHour = new LinkedList<Integer>();
+	public static Integer currentHour = 0;
 	FileWriter logWritter= null;
 	FileWriter errWriter = null;
 	private static Calendar calendar = new GregorianCalendar();
@@ -92,8 +89,6 @@ public class GetMarket {
 		request.setToken(oauth_access_token);
 		request.setTokenSecret(oauth_access_token_secret);
 		
-		TradeUtils.loadDailyHours(dailyHour);		//loading hours for hourly updates	
-		
 		ArrayList<String> list = new ArrayList<String>();
 		list.add("TWTR");
 		list.add("VZ");
@@ -131,7 +126,7 @@ public class GetMarket {
 		//turn STDOUT back on
 		System.setOut(originalStream);
 		System.out.println("\n" + "Trading day over!!\n" + "STDOUT is back on\n");
-		
+		logWritter.flush();
 		logWritter.close();
 	}	
 	
@@ -141,12 +136,12 @@ public class GetMarket {
 			try {
 				//logging all eqs for the day
 				logWritter.write( Arrays.deepToString(allThreadsList.get(i).toArray()) + "\n");
+				logWritter.flush();
 			} catch (Exception e) { System.err.println(logFile + ", file not found"); }
 			
 		}
 		
-		while( (calendar.get(Calendar.HOUR_OF_DAY) > 8 && calendar.get(Calendar.HOUR_OF_DAY) < 16) 
-				|| testCount > 0) {
+		while( true ) {
 			calendar = Calendar.getInstance(TimeZone.getTimeZone(TZ));
 			timeCheck(calendar.get(Calendar.HOUR_OF_DAY));	//log current time on the hour
 			
@@ -178,12 +173,12 @@ public class GetMarket {
 		}
 		
 		//wait on any running threads
-		while(!currentThreads.isEmpty()) {
-			Iterator<String> ite = currentThreads.keySet().iterator();
-			if(ite.hasNext()) {
-				currentThreads.get(ite.next()).join();
-			}
-		}
+//		while(!currentThreads.isEmpty()) {
+//			Iterator<String> ite = currentThreads.keySet().iterator();
+//			if(ite.hasNext()) {
+//				currentThreads.get(ite.next()).join();
+//			}
+//		}
 	}
 
 	
@@ -267,10 +262,10 @@ public class GetMarket {
 	
 	private void timeCheck(int hour) {
 		//outputs time if it is on the mark (for monitoring)
-		if(hour >= dailyHour.peek()) {
+		if(hour > currentHour) {
 			Hashtable<String, Equity> allEquityCopy = allEquity;
 			allEquity = new Hashtable<String, Equity>();
-			dailyHour.poll();
+			currentHour = hour;
 			synchronized(allEquityCopy) {
 				try {
 					logWritter.write("\nTrading system is operational! Currently EST " + hour);
