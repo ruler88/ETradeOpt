@@ -110,8 +110,6 @@ public class GetMarket {
 		GetOption.setPersistList(persistList);
 		GetOption.addExpiringOptions(new MarketClient(request), list);
 		
-		logWritter.write(Arrays.deepToString(list.toArray()));
-		logWritter.write("Equity list size: " + list.size());
 		System.err.println(Arrays.deepToString(list.toArray()));
 		System.err.println("Equity list size: " + list.size());
 		//shut down STDOUT to conserve instance RAM
@@ -141,6 +139,7 @@ public class GetMarket {
 		ArrayList<ArrayList<String>> allThreadsList = TradeUtils.getEquityThreadList(list);
 		for(int i=0; i<allThreadsList.size(); i++) {
 			try {
+				//logging all eqs for the day
 				logWritter.write( Arrays.deepToString(allThreadsList.get(i).toArray()) + "\n");
 			} catch (Exception e) { System.err.println(logFile + ", file not found"); }
 			
@@ -178,6 +177,7 @@ public class GetMarket {
 			}
 		}
 		
+		//wait on any running threads
 		while(!currentThreads.isEmpty()) {
 			Iterator<String> ite = currentThreads.keySet().iterator();
 			if(ite.hasNext()) {
@@ -201,9 +201,6 @@ public class GetMarket {
 			MarketClient client = new MarketClient(request);
 			try {
 				try{
-//					System.err.println("In List: " + list);
-//					System.err.println("In ListSize: " + list.size());
-//					System.err.println("In ListItem: " + list.get(0));
 					QuoteResponse response = client.getQuote(list, true, DetailFlag.ALL);
 					List<QuoteData> data = response.getQuoteData();
 					for(int i=0; i<data.size(); i++) {
@@ -216,9 +213,6 @@ public class GetMarket {
 							Equity tmpEquity = allEquity.get(symbol);
 							tmpEquity.updateInfo(allInfo);
 						} else {
-							if(symbol.equals("GS")) {
-								logWritter.write("Writing new GS: " + new Date() );
-							}
 							Equity tmpEquity = new Equity(symbol);
 							tmpEquity.updateInfo(allInfo);
 							allEquity.put(symbol, tmpEquity);
@@ -277,18 +271,12 @@ public class GetMarket {
 			Hashtable<String, Equity> allEquityCopy = allEquity;
 			allEquity = new Hashtable<String, Equity>();
 			dailyHour.poll();
-			try {
-				logWritter.write("Pre sync time write: " + new Date() );
-			} catch (IOException e1) { }
 			synchronized(allEquityCopy) {
 				try {
-					logWritter.write("Post sync time write: " + new Date() );
-					
 					logWritter.write("\nTrading system is operational! Currently EST " + hour);
 					System.err.println("This is hour: " + hour);
 					
 					DataStorage.serializePartFile(allEquityCopy);
-					logWritter.write("Post serialize time write: " + new Date() );
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
